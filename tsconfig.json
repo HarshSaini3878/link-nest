@@ -21,7 +21,11 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",  // Set the base URL to the root directory
+    "paths": {
+      "@/*": ["./*"]  // Allow importing from the root using '@/'
+    }
   },
   "include": [
     "next-env.d.ts",
