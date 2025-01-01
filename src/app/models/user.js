@@ -40,8 +40,12 @@ const userSchema = new mongoose.Schema(
       default: 'default',
     },
     socialMediaHandles: {
-      type: Map,
-      of: String, // E.g., { twitter: '@user', instagram: '@user' }
+     facebook:{type:String},
+     Github:{type:String},
+     Linkedin:{type:String},
+     Instagram:{type:String},
+     Twitter:{type:String},
+     Youtube:{type:String},
     },
     createdAt: {
       type: Date,

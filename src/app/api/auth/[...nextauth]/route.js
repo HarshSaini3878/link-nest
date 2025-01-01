@@ -85,7 +85,7 @@ export const authOptions = {
     },
   },
   pages: {
-    error: "/auth/error", // Customize the error page
+    error: "/error", // Customize the error page
   },
 };
 
