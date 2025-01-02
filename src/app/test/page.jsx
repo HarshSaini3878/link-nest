@@ -1,4 +1,4 @@
-import EditLinks from '../../component/Editlinks.jsx/index.js'
+import EditLinks from '../../components/component/Editlinks'
 import React from 'react'
 
 const page = () => {
