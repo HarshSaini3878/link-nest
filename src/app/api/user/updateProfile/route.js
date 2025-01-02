@@ -28,7 +28,15 @@ export async function POST(req) {
                 { status: 404 }
             );
         }
-
+        if (username !== user.username) {
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return new NextResponse(
+                    JSON.stringify({ error: 'Username is already taken' }),
+                    { status: 400 }
+                );
+            }
+        }
         // Update the user's profile fields
         user.username = username || user.username;
         user.email = email || user.email; // Assuming you also want to update the email
