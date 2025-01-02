@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
         title: { type: String, required: true },
         url: { type: String, required: true },
         icon: { type: String, default: '' },
-        isActive: { type: Boolean, default: true },
+        
       },
     ],
     theme: {
