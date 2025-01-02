@@ -1,45 +1,55 @@
-'use client'
-
+"use client"
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 
-const UserProfile = () => {
-  const [user, setUser] = useState(null);
-  const { query } = useRouter(); // Get query parameters like username
+const UserProfilePage = () => {
+  const { username } = useParams(); // Access username from dynamic route params
 
-  const { username } = query; // Access 'username' from the URL
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (username) {
-      // Fetch user profile data based on the username
-      const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
+      try {
         const response = await fetch(`/api/user/profile?username=${username}`);
         const data = await response.json();
-        setUser(data); // Assuming the backend returns user data
-      };
 
-      fetchUserProfile();
+        if (response.ok) {
+          setUserData(data.user);
+        } else {
+          setError(data.error || 'User not found');
+        }
+      } catch (err) {
+        setError('Failed to fetch user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (username) {
+      fetchUserData();
     }
   }, [username]);
 
-  if (!username) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div>
-      <h1>User Profile: {username}</h1>
-      {/* You can display the user profile data here */}
-      {user && (
-        <div>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
-          <p>Bio: {user.bio}</p>
-          {/* Add more fields as needed */}
-        </div>
+      <h1>{userData.username}</h1>
+
+      {/* Only render the image if profilePicture is not an empty string */}
+      {userData.profilePicture ? (
+        <img src={userData.profilePicture} alt="Profile" />
+      ) : (
+        <img src="/default-profile-picture.png" alt="Default Profile" />
       )}
+
+      <p>{userData.bio}</p>
+      {/* Render more user data */}
     </div>
   );
 };
 
-export default UserProfile;
+export default UserProfilePage;

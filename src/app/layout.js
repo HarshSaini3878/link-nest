@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
+import { Provider } from "@/components/ui/provider"
 
 // Import Google Fonts
 const geistSans = Geist({
@@ -18,13 +19,13 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Wrap the entire app in the SessionProvider */}
         <SessionProvider>
-          {children}
+        <Provider>{children}</Provider>
         </SessionProvider>
       </body>
     </html>
