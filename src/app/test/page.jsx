@@ -5,8 +5,8 @@ import React from 'react'
 const page = () => {
   return (
     <>
-   <EditLinks user={mockUser} />
-    {/* <EditProfile user={mockUser}/> */}
+   {/* <EditLinks user={mockUser} /> */}
+    <EditProfile user={mockUser}/>
     </>
   )
 }

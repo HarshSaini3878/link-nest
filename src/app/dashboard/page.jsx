@@ -3,21 +3,23 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Button, Spinner, Box, Text } from '@chakra-ui/react'; // Chakra UI for buttons and spinner
+import Editlinks from '../../components/component/Editlinks'; // Import EditLinks component
+import EditProfile from '../../components/component/EditProfile'; // Import EditProfile component
 
 export default function Dashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
   
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [links, setLinks] = useState([]);
+  const [user, setUser] = useState({});
+  const [isEditingLinks, setIsEditingLinks] = useState(false); // State to toggle between edit sections
   
   // Fetch user data if logged in
   useEffect(() => {
+    
     if (status === 'authenticated' && session?.user) {
       const fetchUserData = async () => {
         try {
-          // Replace with your actual user ID or session user ID
           const userId = session.user.id;
 
           // Make an API call to fetch user info
@@ -28,11 +30,9 @@ export default function Dashboard() {
           }
 
           const data = await response.json();
-
+        console.log(data)
           if (data.success) {
-            setName(data.user.username || '');
-            setBio(data.user.bio || '');
-            setLinks(data.user.links || []);
+            setUser(data.user);
           } else {
             console.error('Error fetching user data:', data.error);
           }
@@ -48,7 +48,7 @@ export default function Dashboard() {
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        {/* You can add a loading spinner or message here */}
+        <Spinner size="xl" color="teal.500" />
       </div>
     );
   }
@@ -58,20 +58,50 @@ export default function Dashboard() {
     return null;
   }
 
+  const handleToggleEditLinks = () => {
+    setIsEditingLinks(true); // Show EditLinks
+  };
+
+  const handleToggleEditProfile = () => {
+    setIsEditingLinks(false); // Show EditProfile
+  };
+
   return (
-    <div className="p-4">
-      <h1>Welcome to your Dashboard!</h1>
-      <div>
-        <h2>Name: {name}</h2>
-        <p>Bio: {bio}</p>
-        <div>
-          <h3>Links:</h3>
-          <ul>
-            {links?.map((link, index) => (
-              <li key={index}>{link}</li>
-            ))}
-          </ul>
-        </div>
+    <div className="p-6 bg-gray-800 text-white min-h-screen">
+      <Box textAlign="center" mb="8">
+        <Text fontSize="2xl" fontWeight="bold">Welcome to your Dashboard!</Text>
+      </Box>
+
+      <div className="mt-8">
+        {isEditingLinks ? (
+          // Show EditLinks component
+          <Editlinks user={user} />
+        ) : (
+          // Show EditProfile component
+          <EditProfile user={user} />
+        )}
+      </div>
+
+      {/* Toggle Buttons */}
+      <div className="mt-8 space-x-4 flex justify-center">
+        <Button
+          colorScheme="teal"
+          onClick={handleToggleEditProfile}
+          width="200px"
+          variant={isEditingLinks ? 'ghost' : 'solid'}
+          _hover={{ bg: 'teal.600' }}
+        >
+          Edit Profile
+        </Button>
+        <Button
+          colorScheme="blue"
+          onClick={handleToggleEditLinks}
+          width="200px"
+          variant={isEditingLinks ? 'solid' : 'ghost'}
+          _hover={{ bg: 'blue.600' }}
+        >
+          Edit Links
+        </Button>
       </div>
     </div>
   );
