@@ -4,14 +4,22 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-const signUp = async (email, password, username, bio = '', socialMediaHandles: {
-  facebook:{""},
-  Github:{""},
-  Linkedin:{type:String},
-  Instagram:{type:String},
-  Twitter:{type:String},
-  Youtube:{type:String},
- }) => {
+const defaultSocialMediaHandles = {
+  facebook: '',
+  Github: '',
+  Linkedin: '',
+  Instagram: '',
+  Twitter: '',
+  Youtube: '',
+};
+
+const signUp = async (
+  email,
+  password,
+  username,
+  bio = '', // Default bio if not provided
+  socialMediaHandles = {} // Default empty object if not provided
+) => {
   // Check if the username already exists
   const existingUser = await User.findOne({ username });
   if (existingUser) {
@@ -20,12 +28,16 @@ const signUp = async (email, password, username, bio = '', socialMediaHandles: {
 
   // Hash the password and create the new user
   const hashedPassword = await bcrypt.hash(password, 10);
+  
+  // Merge socialMediaHandles with default values if not provided
+  const finalSocialMediaHandles = { ...defaultSocialMediaHandles, ...socialMediaHandles };
+
   const newUser = new User({
     email,
     username,
     password: hashedPassword, // Store the hashed password
     bio, // Set bio to the passed value or default value
-    socialMediaHandles, // Set socialMediaHandles to the passed value or an empty object
+    socialMediaHandles: finalSocialMediaHandles, // Set socialMediaHandles with merged data
   });
 
   console.log("new user:", newUser);
@@ -39,6 +51,9 @@ const signUp = async (email, password, username, bio = '', socialMediaHandles: {
     throw err; // You can rethrow or handle the error as needed
   }
 };
+
+
+
 
 
 export const authOptions = {
