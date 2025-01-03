@@ -1,44 +1,82 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button, Box, Input, Text, VStack, Flex, IconButton, Spinner, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Input,
+  Text,
+  VStack,
+  Flex,
+  IconButton,
+  Spinner,
+  Image,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 import { Plus, Pencil, Trash, LinkIcon } from "lucide-react";
-import { Toaster, toaster } from "../ui/toaster"
+import { Toaster, toaster } from "../ui/toaster";
+
 const EditLinks = ({ user }) => {
   const [links, setLinks] = useState(user.links || []);
   const [newLink, setNewLink] = useState({ title: "", url: "", icon: "" });
   const [editingIndex, setEditingIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
- 
+
+  // Utility function for URL validation
+  const isValidURL = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewLink({ ...newLink, [name]: value });
   };
 
+  const showToast = (description, type = "info") => {
+    toaster.create({ description, type });
+  };
+
   const handleSaveLink = () => {
-    if (newLink.title && newLink.url) {
-      if (editingIndex !== null) {
-        const updatedLinks = links.map((link, index) =>
-          index === editingIndex ? { ...newLink } : link
-        );
-        setLinks(updatedLinks);
-      } else {
-        setLinks([...links, { ...newLink, title: newLink.title.trim(), url: newLink.url.trim(), icon: newLink.icon.trim() || "" }]);
-      }
-      setNewLink({ title: "", url: "", icon: "" });
-      setEditingIndex(null);
-      setIsDialogOpen(false);
-    } else {
-   
-     
+    const { title, url, icon } = newLink;
+
+    if (!title.trim() || !url.trim()) {
+      showToast("Please fill in both Title and URL", "warning");
+      return;
     }
+
+    if (!isValidURL(url)) {
+      showToast("Please enter a valid URL", "warning");
+      return;
+    }
+
+    const updatedLinks = editingIndex !== null
+      ? links.map((link, index) =>
+          index === editingIndex ? { ...newLink } : link
+        )
+      : [...links, { title: title.trim(), url: url.trim(), icon: icon.trim() }];
+
+    setLinks(updatedLinks);
+    setNewLink({ title: "", url: "", icon: "" });
+    setEditingIndex(null);
+    setIsDialogOpen(false);
+    showToast(editingIndex !== null ? "Link updated" : "New link added", "success");
   };
 
   const handleRemoveLink = (index) => {
     setLinks(links.filter((_, i) => i !== index));
+    showToast("Link removed", "info");
   };
 
   const handleEditLink = (index) => {
@@ -51,7 +89,6 @@ const EditLinks = ({ user }) => {
     if (loading) return;
 
     setLoading(true);
-
     try {
       const response = await fetch("/api/user/updateLinks", {
         method: "POST",
@@ -59,15 +96,15 @@ const EditLinks = ({ user }) => {
         body: JSON.stringify({ userId: user._id, links }),
       });
 
-      if (response.ok) {
-       
-      } else {
+      if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to update links");
       }
+
+      showToast("Links updated successfully", "success");
     } catch (error) {
-      console.error("Error updating links:", error);
-      
+      console.error("Error updating links:", error.message);
+      showToast(`Error updating links: ${error.message}`, "error");
     } finally {
       setLoading(false);
     }
@@ -78,8 +115,8 @@ const EditLinks = ({ user }) => {
       <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6">
         Your Links
       </Text>
+      <Toaster />
 
-      {/* Add New Link Button */}
       <Button
         colorScheme="blue"
         leftIcon={<Plus />}
@@ -90,7 +127,6 @@ const EditLinks = ({ user }) => {
         Add New Link
       </Button>
 
-      {/* Modal to Add/Edit Link */}
       <Modal isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <ModalOverlay />
         <ModalContent>
@@ -126,48 +162,52 @@ const EditLinks = ({ user }) => {
         </ModalContent>
       </Modal>
 
-      {/* List of Links */}
-      <VStack spacing="4">
-        {links.map((link, index) => (
-          <Flex
-            key={index}
-            p="4"
-            bg="gray.50"
-            rounded="md"
-            w="full"
-            justify="space-between"
-            align="center"
-          >
-            <Flex align="center" gap="2">
-              {link.icon ? (
-                <Image src={link.icon} alt={link.title} boxSize="6" />
-              ) : (
-                <LinkIcon />
-              )}
-              <Text as="a" href={link.url} color="blue.600" target="_blank">
-                {link.title}
-              </Text>
+      {links.length === 0 ? (
+        <Text color="gray.500" textAlign="center">
+          No links added yet. Click "Add New Link" to get started!
+        </Text>
+      ) : (
+        <VStack spacing="4">
+          {links.map((link, index) => (
+            <Flex
+              key={index}
+              p="4"
+              bg="gray.50"
+              rounded="md"
+              w="full"
+              justify="space-between"
+              align="center"
+            >
+              <Flex align="center" gap="2">
+                {link.icon ? (
+                  <Image src={link.icon} alt={link.title} boxSize="6" />
+                ) : (
+                  <LinkIcon />
+                )}
+                <Text as="a" href={link.url} color="blue.600" target="_blank">
+                  {link.title}
+                </Text>
+              </Flex>
+              <Flex gap="2">
+                <IconButton
+                  icon={<Pencil />}
+                  size="sm"
+                  onClick={() => handleEditLink(index)}
+                  aria-label="Edit link"
+                />
+                <IconButton
+                  icon={<Trash />}
+                  size="sm"
+                  colorScheme="red"
+                  onClick={() => handleRemoveLink(index)}
+                  aria-label="Delete link"
+                />
+              </Flex>
             </Flex>
-            <Flex gap="2">
-              <IconButton
-                icon={<Pencil />}
-                size="sm"
-                onClick={() => handleEditLink(index)}
-                aria-label="Edit link"
-              />
-              <IconButton
-                icon={<Trash />}
-                size="sm"
-                colorScheme="red"
-                onClick={() => handleRemoveLink(index)}
-                aria-label="Delete link"
-              />
-            </Flex>
-          </Flex>
-        ))}
-      </VStack>
+          ))}
+        </VStack>
+      )}
 
-      {/* Save Button */}
       <Button
         colorScheme="blue"
         onClick={handleSubmit}
