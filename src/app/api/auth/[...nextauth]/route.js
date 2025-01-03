@@ -4,7 +4,14 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-const signUp = async (email, password, username) => {
+const signUp = async (email, password, username, bio = '', socialMediaHandles: {
+  facebook:{""},
+  Github:{""},
+  Linkedin:{type:String},
+  Instagram:{type:String},
+  Twitter:{type:String},
+  Youtube:{type:String},
+ }) => {
   // Check if the username already exists
   const existingUser = await User.findOne({ username });
   if (existingUser) {
@@ -17,11 +24,22 @@ const signUp = async (email, password, username) => {
     email,
     username,
     password: hashedPassword, // Store the hashed password
+    bio, // Set bio to the passed value or default value
+    socialMediaHandles, // Set socialMediaHandles to the passed value or an empty object
   });
 
-  await newUser.save();
-  return newUser;
+  console.log("new user:", newUser);
+
+  try {
+    const savedUser = await newUser.save();
+    console.log('User saved:', savedUser);
+    return savedUser;
+  } catch (err) {
+    console.log('Error saving user:', err);
+    throw err; // You can rethrow or handle the error as needed
+  }
 };
+
 
 export const authOptions = {
   providers: [

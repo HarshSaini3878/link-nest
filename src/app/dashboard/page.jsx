@@ -21,7 +21,7 @@ export default function Dashboard() {
       const fetchUserData = async () => {
         try {
           const userId = session.user.id;
-
+             console.log(session,"session")
           // Make an API call to fetch user info
           const response = await fetch(`/api/user/getUserInfo?userId=${userId}`);
 

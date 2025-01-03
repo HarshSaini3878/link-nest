@@ -26,7 +26,9 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
       maxLength: [160, 'Bio must not exceed 160 characters'],
+      default: 'heelo baccho',
     },
+    
     links: [
       {
         title: { type: String, required: true },

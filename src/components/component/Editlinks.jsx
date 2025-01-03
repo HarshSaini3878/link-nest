@@ -11,7 +11,7 @@ import {
   Spinner,
   Image,
 } from "@chakra-ui/react";
-import { Plus, Pencil, Trash, LinkIcon } from "lucide-react";
+import { Plus, Pencil, Trash, LinkIcon, CrossIcon, UtensilsCrossed } from "lucide-react";
 import { Toaster, toaster } from "../ui/toaster";
 import {
   DialogBody,
@@ -135,7 +135,7 @@ const EditLinks = ({ user }) => {
 
         <DialogRoot>
           <DialogTrigger asChild>
-            <Button
+            <IconButton
               bg="blue.500"
               color="white"
               _hover={{ bg: "blue.600" }}
@@ -144,7 +144,7 @@ const EditLinks = ({ user }) => {
               onClick={() => setEditingIndex(null)} // Create new link
             >
               <Plus /> Add New Link
-            </Button>
+            </IconButton>
           </DialogTrigger>
 
           <DialogContent>
@@ -174,14 +174,14 @@ const EditLinks = ({ user }) => {
               </VStack>
             </DialogBody>
             <DialogFooter>
-              <Button
+              <IconButton
                 bg="blue.500"
                 color="white"
                 _hover={{ bg: "blue.600" }}
                 onClick={handleSaveLink}
               >
                 Save
-              </Button>
+              </IconButton>
               <DialogCloseTrigger asChild={true}>
   <IconButton
     variant="ghost"
@@ -190,7 +190,9 @@ const EditLinks = ({ user }) => {
     position="absolute"
     top="2"
     insetEnd="2"
-  />
+  >
+    <UtensilsCrossed color="#de1212" absoluteStrokeWidth />
+  </IconButton>
 </DialogCloseTrigger>
 
             </DialogFooter>
