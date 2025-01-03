@@ -42,6 +42,7 @@ const EditLinks = ({ user }) => {
 
   const handleSaveLink = () => {
     const { title, url, icon } = newLink;
+    
 
     if (!title.trim() || !url.trim()) {
       showToast("Please fill in both Title and URL", "warning");
@@ -123,12 +124,11 @@ const EditLinks = ({ user }) => {
             bg="blue.500"
             color="white"
             _hover={{ bg: "blue.600" }}
-            leftIcon={<Plus />}
             mb="4"
             w="full"
-            onClick={() => setEditingIndex(null)}
+            onClick={() => setEditingIndex(null)} // Create new link
           >
-            Add New Link
+            <Plus /> Add New Link
           </Button>
         </DialogTrigger>
 
@@ -143,21 +143,20 @@ const EditLinks = ({ user }) => {
                 name="title"
                 value={newLink.title}
                 onChange={handleInputChange}
-                focusBorderColor="green.400"
               />
               <Input
                 placeholder="URL"
                 name="url"
                 value={newLink.url}
                 onChange={handleInputChange}
-                focusBorderColor="green.400"
+                
               />
               <Input
                 placeholder="Icon URL (optional)"
                 name="icon"
                 value={newLink.icon}
                 onChange={handleInputChange}
-                focusBorderColor="blue.400"
+              
               />
             </VStack>
           </DialogBody>
@@ -167,8 +166,10 @@ const EditLinks = ({ user }) => {
               color="white"
               _hover={{ bg: "blue.600" }}
               onClick={handleSaveLink}
+              
             >
-              {editingIndex !== null ? "Update" : "Add"} Link
+              
+              Save
             </Button>
             <DialogCloseTrigger asChild>
               <Button variant="ghost" color="gray.500">
@@ -207,18 +208,15 @@ const EditLinks = ({ user }) => {
               </Flex>
               <Flex gap="2">
                 <IconButton
-                 
-                  size="sm"
+                 size="sm"
                   bg="blue.500"
                   color="white"
                   _hover={{ bg: "blue.600" }}
                   onClick={() => handleEditLink(index)}
-                  aria-label="Edit link"
                 >
-                  <Pencil />
-                 </IconButton>
+                  <Pencil /> 
+                </IconButton>
                 <IconButton
-                 
                   size="sm"
                   bg="red.500"
                   color="white"
