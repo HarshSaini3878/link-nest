@@ -14,12 +14,12 @@ const mockUser = {
   _id: '12345',
   links: [
     {
-      title: 'Google',
+      title: 'portfolio',
       url: 'https://www.google.com',
       icon: 'https://www.google.com/favicon.ico',
     },
     {
-      title: 'GitHub',
+      title: 'leetcode',
       url: 'https://github.com',
       icon: 'https://github.githubassets.com/favicon.ico',
     },

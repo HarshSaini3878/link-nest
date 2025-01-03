@@ -11,33 +11,25 @@ import {
   IconButton,
   Spinner,
   Image,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  ModalCloseButton,
 } from "@chakra-ui/react";
 import { Plus, Pencil, Trash, LinkIcon } from "lucide-react";
 import { Toaster, toaster } from "../ui/toaster";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogRoot,
+  DialogTrigger,
+} from "../ui/dialog";
 
 const EditLinks = ({ user }) => {
   const [links, setLinks] = useState(user.links || []);
   const [newLink, setNewLink] = useState({ title: "", url: "", icon: "" });
   const [editingIndex, setEditingIndex] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Utility function for URL validation
-  const isValidURL = (url) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,21 +48,30 @@ const EditLinks = ({ user }) => {
       return;
     }
 
+    const isValidURL = (url) => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     if (!isValidURL(url)) {
       showToast("Please enter a valid URL", "warning");
       return;
     }
 
-    const updatedLinks = editingIndex !== null
-      ? links.map((link, index) =>
-          index === editingIndex ? { ...newLink } : link
-        )
-      : [...links, { title: title.trim(), url: url.trim(), icon: icon.trim() }];
+    const updatedLinks =
+      editingIndex !== null
+        ? links.map((link, index) =>
+            index === editingIndex ? { ...newLink } : link
+          )
+        : [...links, { title: title.trim(), url: url.trim(), icon: icon.trim() }];
 
     setLinks(updatedLinks);
     setNewLink({ title: "", url: "", icon: "" });
     setEditingIndex(null);
-    setIsDialogOpen(false);
     showToast(editingIndex !== null ? "Link updated" : "New link added", "success");
   };
 
@@ -82,7 +83,6 @@ const EditLinks = ({ user }) => {
   const handleEditLink = (index) => {
     setEditingIndex(index);
     setNewLink({ ...links[index] });
-    setIsDialogOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -111,59 +111,76 @@ const EditLinks = ({ user }) => {
   };
 
   return (
-    <Box maxW="2xl" mx="auto" p="6" bg="white" shadow="lg" rounded="lg">
-      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6">
+    <Box maxW="2xl" mx="auto" p="6" bg="gray.800" color="white" shadow="lg" rounded="lg">
+      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6" color="blue.400">
         Your Links
       </Text>
       <Toaster />
 
-      <Button
-        colorScheme="blue"
-        leftIcon={<Plus />}
-        onClick={() => setIsDialogOpen(true)}
-        mb="4"
-        w="full"
-      >
-        Add New Link
-      </Button>
+      <DialogRoot>
+        <DialogTrigger asChild>
+          <Button
+            bg="blue.500"
+            color="white"
+            _hover={{ bg: "blue.600" }}
+            leftIcon={<Plus />}
+            mb="4"
+            w="full"
+            onClick={() => setEditingIndex(null)}
+          >
+            Add New Link
+          </Button>
+        </DialogTrigger>
 
-      <Modal isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{editingIndex !== null ? "Edit Link" : "Add Link"}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingIndex !== null ? "Edit Link" : "Add Link"}</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
             <VStack spacing="4">
               <Input
                 placeholder="Title"
                 name="title"
                 value={newLink.title}
                 onChange={handleInputChange}
+                focusBorderColor="green.400"
               />
               <Input
                 placeholder="URL"
                 name="url"
                 value={newLink.url}
                 onChange={handleInputChange}
+                focusBorderColor="green.400"
               />
               <Input
                 placeholder="Icon URL (optional)"
                 name="icon"
                 value={newLink.icon}
                 onChange={handleInputChange}
+                focusBorderColor="blue.400"
               />
             </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleSaveLink}>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              bg="blue.500"
+              color="white"
+              _hover={{ bg: "blue.600" }}
+              onClick={handleSaveLink}
+            >
               {editingIndex !== null ? "Update" : "Add"} Link
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <DialogCloseTrigger asChild>
+              <Button variant="ghost" color="gray.500">
+                Cancel
+              </Button>
+            </DialogCloseTrigger>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
 
       {links.length === 0 ? (
-        <Text color="gray.500" textAlign="center">
+        <Text color="gray.400" textAlign="center">
           No links added yet. Click "Add New Link" to get started!
         </Text>
       ) : (
@@ -172,7 +189,7 @@ const EditLinks = ({ user }) => {
             <Flex
               key={index}
               p="4"
-              bg="gray.50"
+              bg="gray.700"
               rounded="md"
               w="full"
               justify="space-between"
@@ -184,24 +201,33 @@ const EditLinks = ({ user }) => {
                 ) : (
                   <LinkIcon />
                 )}
-                <Text as="a" href={link.url} color="blue.600" target="_blank">
+                <Text as="a" href={link.url} color="blue.300" target="_blank">
                   {link.title}
                 </Text>
               </Flex>
               <Flex gap="2">
                 <IconButton
-                  icon={<Pencil />}
+                 
                   size="sm"
+                  bg="blue.500"
+                  color="white"
+                  _hover={{ bg: "blue.600" }}
                   onClick={() => handleEditLink(index)}
                   aria-label="Edit link"
-                />
+                >
+                  <Pencil />
+                 </IconButton>
                 <IconButton
-                  icon={<Trash />}
+                 
                   size="sm"
-                  colorScheme="red"
+                  bg="red.500"
+                  color="white"
+                  _hover={{ bg: "red.600" }}
                   onClick={() => handleRemoveLink(index)}
                   aria-label="Delete link"
-                />
+                >
+                  <Trash />
+                </IconButton>
               </Flex>
             </Flex>
           ))}
@@ -209,7 +235,9 @@ const EditLinks = ({ user }) => {
       )}
 
       <Button
-        colorScheme="blue"
+        bg="green.500"
+        color="white"
+        _hover={{ bg: "green.600" }}
         onClick={handleSubmit}
         isLoading={loading}
         loadingText="Updating..."
