@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-
+import { Box, Button, Input, FormLabel, VStack, Text } from '@chakra-ui/react';
+import { Toaster, toaster } from "../ui/toaster";
 const EditProfile = ({ user }) => {
   const [profileData, setProfileData] = useState({
     username: user.username || '',
@@ -17,6 +18,7 @@ const EditProfile = ({ user }) => {
     }
   });
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -69,121 +71,109 @@ const EditProfile = ({ user }) => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Profile updated successfully');
+        toast({
+          title: 'Profile updated successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
-        alert(data.error || 'Failed to update profile');
+        toast({
+          title: data.error || 'Failed to update profile',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('An error occurred while updating profile');
+      toast({
+        title: 'An error occurred while updating profile',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-4">
-      <h2>Edit Profile</h2>
-      
-      <div className="form-group">
-        <input
-          type="text"
+    <Box maxW="lg" mx="auto" p="6" bg="gray.800" color="white" borderRadius="lg" boxShadow="lg">
+      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6">
+        Edit Profile
+      </Text>
+      <VStack spacing="4" align="stretch">
+        <FormLabel htmlFor="username">Username</FormLabel>
+        <Input
+          id="username"
           name="username"
           value={profileData.username}
           onChange={handleInputChange}
           placeholder="Username"
-          className="border p-2 my-2 w-full"
         />
-        <input
-          type="email"
+
+        <FormLabel htmlFor="email">Email</FormLabel>
+        <Input
+          id="email"
           name="email"
           value={profileData.email}
           onChange={handleInputChange}
           placeholder="Email"
-          className="border p-2 my-2 w-full"
-          disabled
+          isDisabled
         />
-        <input
-          type="text"
+
+        <FormLabel htmlFor="bio">Bio</FormLabel>
+        <Input
+          id="bio"
           name="bio"
           value={profileData.bio}
           onChange={handleInputChange}
           placeholder="Bio"
           maxLength="160"
-          className="border p-2 my-2 w-full"
         />
-        <input
-          type="url"
+
+        <FormLabel htmlFor="profilePicture">Profile Picture URL</FormLabel>
+        <Input
+          id="profilePicture"
           name="profilePicture"
           value={profileData.profilePicture}
           onChange={handleProfilePictureChange}
           placeholder="Profile Picture URL"
-          className="border p-2 my-2 w-full"
         />
-      </div>
+      </VStack>
 
-      <div className="social-media-handles mt-4">
-        <h3>Social Media Handles</h3>
-        <input
-          type="url"
-          name="facebook"
-          value={profileData.socialMediaHandles.facebook}
-          onChange={handleSocialMediaChange}
-          placeholder="Facebook URL"
-          className="border p-2 my-2 w-full"
-        />
-        <input
-          type="url"
-          name="github"
-          value={profileData.socialMediaHandles.github}
-          onChange={handleSocialMediaChange}
-          placeholder="GitHub URL"
-          className="border p-2 my-2 w-full"
-        />
-        <input
-          type="url"
-          name="linkedin"
-          value={profileData.socialMediaHandles.linkedin}
-          onChange={handleSocialMediaChange}
-          placeholder="LinkedIn URL"
-          className="border p-2 my-2 w-full"
-        />
-        <input
-          type="url"
-          name="instagram"
-          value={profileData.socialMediaHandles.instagram}
-          onChange={handleSocialMediaChange}
-          placeholder="Instagram URL"
-          className="border p-2 my-2 w-full"
-        />
-        <input
-          type="url"
-          name="twitter"
-          value={profileData.socialMediaHandles.twitter}
-          onChange={handleSocialMediaChange}
-          placeholder="Twitter URL"
-          className="border p-2 my-2 w-full"
-        />
-        <input
-          type="url"
-          name="youtube"
-          value={profileData.socialMediaHandles.youtube}
-          onChange={handleSocialMediaChange}
-          placeholder="YouTube URL"
-          className="border p-2 my-2 w-full"
-        />
-      </div>
+      <Box mt="6">
+        <Text fontSize="lg" fontWeight="bold" mb="2">
+          Social Media Handles
+        </Text>
+        <VStack spacing="4" align="stretch">
+          {Object.keys(profileData.socialMediaHandles).map((handle) => (
+            <div key={handle}>
+              <FormLabel htmlFor={handle}>{handle.charAt(0).toUpperCase() + handle.slice(1)}</FormLabel>
+              <Input
+                id={handle}
+                name={handle}
+                value={profileData.socialMediaHandles[handle]}
+                onChange={handleSocialMediaChange}
+                placeholder={`${handle.charAt(0).toUpperCase() + handle.slice(1)} URL`}
+              />
+            </div>
+          ))}
+        </VStack>
+      </Box>
 
-      <div className="mt-4">
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-500 text-white px-6 py-2"
-          disabled={loading}
-        >
-          {loading ? 'Updating...' : 'Save Changes'}
-        </button>
-      </div>
-    </div>
+      <Button
+        mt="6"
+        colorScheme="blue"
+        onClick={handleSubmit}
+        isLoading={loading}
+        loadingText="Updating..."
+        width="full"
+      >
+        Save Changes
+      </Button>
+    </Box>
   );
 };
 

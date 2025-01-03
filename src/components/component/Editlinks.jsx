@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  Box,
   Button,
   Input,
   Text,
@@ -42,8 +41,6 @@ const EditLinks = ({ user }) => {
 
   const handleSaveLink = () => {
     const { title, url, icon } = newLink;
-    
-
     if (!title.trim() || !url.trim()) {
       showToast("Please fill in both Title and URL", "warning");
       return;
@@ -112,139 +109,162 @@ const EditLinks = ({ user }) => {
   };
 
   return (
-    <Box maxW="2xl" mx="auto" p="6" bg="gray.800" color="white" shadow="lg" rounded="lg">
-      <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6" color="blue.400">
-        Your Links
-      </Text>
-      <Toaster />
+    <Flex
+      justify="center"
+      align="center"
+      h="100vh"
+      bgGradient="linear(to-r, green.400, blue.500)"
+    >
+      <div
+        style={{
+          maxWidth: "40rem",
+          width: "100%",
+          padding: "2rem",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          color: "white",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+        }}
+      >
+        <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6" color="white">
+          Your Links
+        </Text>
+        <Toaster />
 
-      <DialogRoot>
-        <DialogTrigger asChild>
-          <Button
-            bg="blue.500"
-            color="white"
-            _hover={{ bg: "blue.600" }}
-            mb="4"
-            w="full"
-            onClick={() => setEditingIndex(null)} // Create new link
-          >
-            <Plus /> Add New Link
-          </Button>
-        </DialogTrigger>
-
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingIndex !== null ? "Edit Link" : "Add Link"}</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <VStack spacing="4">
-              <Input
-                placeholder="Title"
-                name="title"
-                value={newLink.title}
-                onChange={handleInputChange}
-              />
-              <Input
-                placeholder="URL"
-                name="url"
-                value={newLink.url}
-                onChange={handleInputChange}
-                
-              />
-              <Input
-                placeholder="Icon URL (optional)"
-                name="icon"
-                value={newLink.icon}
-                onChange={handleInputChange}
-              
-              />
-            </VStack>
-          </DialogBody>
-          <DialogFooter>
+        <DialogRoot>
+          <DialogTrigger asChild>
             <Button
               bg="blue.500"
               color="white"
               _hover={{ bg: "blue.600" }}
-              onClick={handleSaveLink}
-              
-            >
-              
-              Save
-            </Button>
-            <DialogCloseTrigger asChild>
-              <Button variant="ghost" color="gray.500">
-                Cancel
-              </Button>
-            </DialogCloseTrigger>
-          </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
-
-      {links.length === 0 ? (
-        <Text color="gray.400" textAlign="center">
-          No links added yet. Click "Add New Link" to get started!
-        </Text>
-      ) : (
-        <VStack spacing="4">
-          {links.map((link, index) => (
-            <Flex
-              key={index}
-              p="4"
-              bg="gray.700"
-              rounded="md"
+              mb="4"
               w="full"
-              justify="space-between"
-              align="center"
+              onClick={() => setEditingIndex(null)} // Create new link
             >
-              <Flex align="center" gap="2">
-                {link.icon ? (
-                  <Image src={link.icon} alt={link.title} boxSize="6" />
-                ) : (
-                  <LinkIcon />
-                )}
-                <Text as="a" href={link.url} color="blue.300" target="_blank">
-                  {link.title}
-                </Text>
-              </Flex>
-              <Flex gap="2">
-                <IconButton
-                 size="sm"
-                  bg="blue.500"
-                  color="white"
-                  _hover={{ bg: "blue.600" }}
-                  onClick={() => handleEditLink(index)}
-                >
-                  <Pencil /> 
-                </IconButton>
-                <IconButton
-                  size="sm"
-                  bg="red.500"
-                  color="white"
-                  _hover={{ bg: "red.600" }}
-                  onClick={() => handleRemoveLink(index)}
-                  aria-label="Delete link"
-                >
-                  <Trash />
-                </IconButton>
-              </Flex>
-            </Flex>
-          ))}
-        </VStack>
-      )}
+              <Plus /> Add New Link
+            </Button>
+          </DialogTrigger>
 
-      <Button
-        bg="green.500"
-        color="white"
-        _hover={{ bg: "green.600" }}
-        onClick={handleSubmit}
-        isLoading={loading}
-        loadingText="Updating..."
-        w="full"
-        mt="6"
-      >
-        Save All Links
-      </Button>
-    </Box>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingIndex !== null ? "Edit Link" : "Add Link"}</DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              <VStack spacing="4">
+                <Input
+                  placeholder="Title"
+                  name="title"
+                  value={newLink.title}
+                  onChange={handleInputChange}
+                />
+                <Input
+                  placeholder="URL"
+                  name="url"
+                  value={newLink.url}
+                  onChange={handleInputChange}
+                />
+                <Input
+                  placeholder="Icon URL (optional)"
+                  name="icon"
+                  value={newLink.icon}
+                  onChange={handleInputChange}
+                />
+              </VStack>
+            </DialogBody>
+            <DialogFooter>
+              <Button
+                bg="blue.500"
+                color="white"
+                _hover={{ bg: "blue.600" }}
+                onClick={handleSaveLink}
+              >
+                Save
+              </Button>
+              <DialogCloseTrigger asChild={true}>
+  <IconButton
+    variant="ghost"
+    aria-label="Close"
+    size="sm"
+    position="absolute"
+    top="2"
+    insetEnd="2"
+  />
+</DialogCloseTrigger>
+
+            </DialogFooter>
+          </DialogContent>
+        </DialogRoot>
+
+        {links.length === 0 ? (
+          <Text color="gray.400" textAlign="center">
+            No links added yet. Click "Add New Link" to get started!
+          </Text>
+        ) : (
+          <VStack spacing="4">
+            {links.map((link, index) => (
+              <Flex
+                key={index}
+                p="4"
+                bg="rgba(255, 255, 255, 0.2)"
+                backdropFilter="blur(5px)"
+                rounded="md"
+                w="full"
+                justify="space-between"
+                align="center"
+                border="1px solid rgba(255, 255, 255, 0.2)"
+              >
+                <Flex align="center" gap="2">
+                  {link.icon ? (
+                    <Image src={link.icon} alt={link.title} boxSize="6" />
+                  ) : (
+                    <LinkIcon />
+                  )}
+                  <Text as="a" href={link.url} color="blue.300" target="_blank">
+                    {link.title}
+                  </Text>
+                </Flex>
+                <Flex gap="2">
+                  <IconButton
+                    size="sm"
+                    bg="blue.500"
+                    color="white"
+                    _hover={{ bg: "blue.600" }}
+                    onClick={() => handleEditLink(index)}
+                  >
+                    <Pencil />
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    bg="red.500"
+                    color="white"
+                    _hover={{ bg: "red.600" }}
+                    onClick={() => handleRemoveLink(index)}
+                    aria-label="Delete link"
+                  >
+                    <Trash />
+                  </IconButton>
+                </Flex>
+              </Flex>
+            ))}
+          </VStack>
+        )}
+
+        <Button
+          bg="green.500"
+          color="white"
+          _hover={{ bg: "green.600" }}
+          onClick={handleSubmit}
+          isLoading={loading}
+          loadingText="Updating..."
+          w="full"
+          mt="6"
+        >
+          Save All Links
+        </Button>
+      </div>
+    </Flex>
   );
 };
 
