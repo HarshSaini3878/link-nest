@@ -15,11 +15,11 @@ const EditProfile = ({ user }) => {
     profilePicture: user.profilePicture || "",
     socialMediaHandles: user.socialMediaHandles || {
       facebook: "",
-      github: "",
-      linkedin: "",
-      instagram: "",
-      twitter: "",
-      youtube: "",
+      Github: "",
+      Linkedin: "",
+      Instagram: "",
+      Twitter: "",
+      Youtube: "",
     },
   });
   useEffect(() => {
@@ -31,11 +31,11 @@ const EditProfile = ({ user }) => {
         profilePicture: user.profilePicture || "",
         socialMediaHandles: user.socialMediaHandles || {
           facebook: "",
-          github: "",
-          linkedin: "",
-          instagram: "",
-          twitter: "",
-          youtube: "",
+      Github: "",
+      Linkedin: "",
+      Instagram: "",
+      Twitter: "",
+      Youtube: "",
         },
       });
     }
@@ -72,6 +72,7 @@ const EditProfile = ({ user }) => {
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
+    console.log("profirl",profileData);
 
     try {
       const response = await fetch("/api/user/updateProfile", {
@@ -134,7 +135,7 @@ const EditProfile = ({ user }) => {
                   _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
                 />
               </div>
-
+<Toaster/>
               <div>
                 <Field label htmlFor="email" style={{ display: "block", fontWeight: "normal" }}>
                   Email
@@ -248,15 +249,15 @@ const EditProfile = ({ user }) => {
     switch (handle) {
       case "facebook":
         return <FaFacebook size="24px" />;
-      case "github":
+      case "Github":
         return <FaGithub size="24px" />;
-      case "linkedin":
+      case "Linkedin":
         return <FaLinkedin size="24px" />;
-      case "instagram":
+      case "Instagram":
         return <FaInstagram size="24px" />;
-      case "twitter":
+      case "Twitter":
         return <FaTwitter size="24px" />;
-      case "youtube":
+      case "Youtube":
         return <FaYoutube size="24px" />;
       default:
         return null;

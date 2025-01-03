@@ -4,18 +4,22 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req) {
     try {
-        const { userId, ProfileData } = await req.json();
-
-        // Destructure ProfileData
-        const { username, email, bio, profilePicture, socialMediaHandles } = ProfileData;
+        // Parse the request body correctly
+        const { userId, profileData } = await req.json(); // Use .json() to get the request body
 
         // Check if userId and ProfileData are provided
-        if (!userId || !ProfileData || typeof ProfileData !== 'object') {
+        if (!userId || !profileData || typeof profileData !== 'object') {
             return new NextResponse(
                 JSON.stringify({ error: 'User ID and Profile Data are required' }),
                 { status: 400 }
             );
         }
+
+        // Log the profile data (optional for debugging)
+        console.log("Profile data:", profileData);
+
+        // Destructure ProfileData
+        const { username, email, bio, profilePicture, socialMediaHandles } = profileData;
 
         // Connect to the database
         await connectDB();
@@ -28,6 +32,8 @@ export async function POST(req) {
                 { status: 404 }
             );
         }
+
+        // Check if the username is being changed and validate uniqueness
         if (username !== user.username) {
             const existingUser = await User.findOne({ username });
             if (existingUser) {
@@ -37,12 +43,13 @@ export async function POST(req) {
                 );
             }
         }
-        // Update the user's profile fields
+
+        // Update the user's profile fields, only update if new value is provided
         user.username = username || user.username;
         user.email = email || user.email; // Assuming you also want to update the email
         user.bio = bio || user.bio;
         user.profilePicture = profilePicture || user.profilePicture;
-        user.socialMediaHandles =user.socialMediaHandles||socialMediaHandles;
+        user.socialMediaHandles = socialMediaHandles || user.socialMediaHandles;
 
         // Save the updated user
         await user.save();
