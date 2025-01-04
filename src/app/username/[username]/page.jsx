@@ -1,9 +1,11 @@
-"use client"
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+"use client";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 const UserProfilePage = () => {
-  const { username } = useParams(); // Access username from dynamic route params
+  const { username } = useParams();
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,10 +20,10 @@ const UserProfilePage = () => {
         if (response.ok) {
           setUserData(data.user);
         } else {
-          setError(data.error || 'User not found');
+          setError(data.error || "User not found");
         }
       } catch (err) {
-        setError('Failed to fetch user data');
+        setError("Failed to fetch user data");
       } finally {
         setLoading(false);
       }
@@ -32,22 +34,84 @@ const UserProfilePage = () => {
     }
   }, [username]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p className="text-center mt-10 text-lg">Loading...</p>;
+  if (error) return <p className="text-center mt-10 text-lg text-red-500">{error}</p>;
 
   return (
-    <div>
-      <h1>{userData.username}</h1>
+    <div className="flex flex-col items-center p-6 space-y-6">
+      {/* Profile Photo */}
+      <motion.div
+        className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300 shadow-lg"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 120 }}
+      >
+        <img
+          src={userData.profilePicture || "/default-profile-picture.png"}
+          alt="Profile"
+          className="w-full h-full object-cover"
+        />
+      </motion.div>
 
-      {/* Only render the image if profilePicture is not an empty string */}
-      {userData.profilePicture ? (
-        <img src={userData.profilePicture} alt="Profile" />
-      ) : (
-        <img src="/default-profile-picture.png" alt="Default Profile" />
-      )}
+      {/* Username */}
+      <h1 className="text-2xl font-bold">{userData.username}</h1>
 
-      <p>{userData.bio}</p>
-      {/* Render more user data */}
+      {/* Links */}
+      <motion.div
+        className="flex flex-col items-center space-y-2"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+              delayChildren: 0.2,
+              staggerChildren: 0.1,
+            },
+          },
+        }}
+      >
+        {userData.links.map((link, index) => (
+          <motion.a
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-lg text-blue-500 hover:text-blue-700 transition"
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0 },
+            }}
+          >
+            {link.icon && <img src={link.icon} alt={link.title} className="inline w-6 h-6 mr-2" />}
+            {link.title}
+          </motion.a>
+        ))}
+      </motion.div>
+
+      {/* Social Media Handles */}
+      <motion.div
+        className="flex space-x-4 mt-4"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        {Object.entries(userData.socialMediaHandles).map(([platform, url]) => (
+          url && (
+            <Link
+              key={platform}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
+            >
+              <img src={`/icons/${platform.toLowerCase()}.svg`} alt={platform} className="w-5 h-5" />
+            </Link>
+          )
+        ))}
+      </motion.div>
     </div>
   );
 };
