@@ -2,7 +2,14 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import {
+  Facebook,
+  Github,
+  Linkedin,
+  Instagram,
+  Twitter,
+  Youtube,
+} from "lucide-react";
 
 const UserProfilePage = () => {
   const { username } = useParams();
@@ -36,6 +43,15 @@ const UserProfilePage = () => {
 
   if (loading) return <p className="text-center mt-10 text-lg">Loading...</p>;
   if (error) return <p className="text-center mt-10 text-lg text-red-500">{error}</p>;
+
+  const iconMap = {
+    facebook: <Facebook className="w-5 h-5" />,
+    github: <Github className="w-5 h-5" />,
+    linkedin: <Linkedin className="w-5 h-5" />,
+    instagram: <Instagram className="w-5 h-5" />,
+    twitter: <Twitter className="w-5 h-5" />,
+    youtube: <Youtube className="w-5 h-5" />,
+  };
 
   return (
     <div className="flex flex-col items-center p-6 space-y-6">
@@ -85,14 +101,13 @@ const UserProfilePage = () => {
               visible: { opacity: 1, y: 0 },
             }}
           >
-            {link.icon && <img src={link.icon} alt={link.title} className="inline w-6 h-6 mr-2" />}
             {link.title}
           </motion.a>
         ))}
       </motion.div>
 
       {/* Social Media Handles */}
-      <motion.div
+      <motion.ul
         className="flex space-x-4 mt-4"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -100,18 +115,19 @@ const UserProfilePage = () => {
       >
         {Object.entries(userData.socialMediaHandles).map(([platform, url]) => (
           url && (
-            <Link
-              key={platform}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
-            >
-              <img src={`/icons/${platform.toLowerCase()}.svg`} alt={platform} className="w-5 h-5" />
-            </Link>
+            <li key={platform}>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
+              >
+                {iconMap[platform.toLowerCase()]}
+              </a>
+            </li>
           )
         ))}
-      </motion.div>
+      </motion.ul>
     </div>
   );
 };
