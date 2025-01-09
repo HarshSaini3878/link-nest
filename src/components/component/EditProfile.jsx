@@ -1,11 +1,9 @@
-"use client";
 import React, { useEffect, useState } from "react";
-import { Box, Button, Input, VStack, Text, Fieldset, IconButton, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Button, Input, VStack, Text, Fieldset, IconButton, Grid, GridItem, Textarea, Image } from "@chakra-ui/react";
 import { Toaster, toaster } from "../ui/toaster";
 import { Separator } from "@chakra-ui/react";
 import { Field } from "../ui/field";
 import { FaFacebook, FaGithub, FaLinkedin, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
-import { Textarea } from "@chakra-ui/react";
 
 const EditProfile = ({ user }) => {
   const [profileData, setProfileData] = useState({
@@ -22,6 +20,7 @@ const EditProfile = ({ user }) => {
       Youtube: "",
     },
   });
+
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -31,15 +30,16 @@ const EditProfile = ({ user }) => {
         profilePicture: user.profilePicture || "",
         socialMediaHandles: user.socialMediaHandles || {
           facebook: "",
-      Github: "",
-      Linkedin: "",
-      Instagram: "",
-      Twitter: "",
-      Youtube: "",
+          Github: "",
+          Linkedin: "",
+          Instagram: "",
+          Twitter: "",
+          Youtube: "",
         },
       });
     }
   }, [user]);
+
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -61,20 +61,44 @@ const EditProfile = ({ user }) => {
     });
   };
 
-  const handleProfilePictureChange = (e) => {
-    const { value } = e.target;
-    setProfileData({
-      ...profileData,
-      profilePicture: value,
-    });
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Here, you can handle the file upload to your server or a service like Cloudinary
+      uploadProfilePicture(file);
+    }
+  };
+
+  const uploadProfilePicture = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);  // The file you want to upload
+    formData.append("upload_preset", "LinkNest");  // The name of your unsigned upload preset
+    formData.append("folder", "user_images"); // replace with your Cloudinary preset
+
+    try {
+      const response = await fetch("https://api.cloudinary.com/v1_1/dskfkk0wf/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.secure_url) {
+        setProfileData({
+          ...profileData,
+          profilePicture: data.secure_url,
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      showToast("Failed to upload profile picture", "error");
+    }
   };
 
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
-    console.log("profirl",profileData);
-
     try {
+      // Ensure profileData has the latest profilePicture URL after upload
       const response = await fetch("/api/user/updateProfile", {
         method: "POST",
         headers: {
@@ -82,12 +106,11 @@ const EditProfile = ({ user }) => {
         },
         body: JSON.stringify({
           userId: user._id,
-          profileData,
+          profileData,  // Passing the full profileData including profilePicture URL
         }),
       });
-
+  
       const data = await response.json();
-
       if (response.ok) {
         showToast("Profile updated successfully", "success");
       } else {
@@ -100,6 +123,7 @@ const EditProfile = ({ user }) => {
       setLoading(false);
     }
   };
+  
 
   const showToast = (description, type = "info") => {
     toaster.create({ description, type });
@@ -135,7 +159,7 @@ const EditProfile = ({ user }) => {
                   _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
                 />
               </div>
-<Toaster/>
+
               <div>
                 <Field label htmlFor="email" style={{ display: "block", fontWeight: "normal" }}>
                   Email
@@ -175,20 +199,23 @@ const EditProfile = ({ user }) => {
 
               <div>
                 <Field label htmlFor="profilePicture" style={{ display: "block", fontWeight: "normal" }}>
-                  Profile Picture URL
+                  Profile Picture
                 </Field>
                 <Input
                   id="profilePicture"
                   name="profilePicture"
-                  value={profileData.profilePicture}
-                  onChange={handleProfilePictureChange}
-                  placeholder="Enter image URL"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
                   bgGradient="linear(to-r, teal.500, green.500)"
                   paddingX="4"
                   borderColor="gray.600"
-                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }} 
+                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
                   variant={"subtle"}
                 />
+                {profileData.profilePicture && (
+                  <Image src={profileData.profilePicture} alt="Profile Picture" boxSize="100px" objectFit="cover" mt="4" />
+                )}
               </div>
             </Fieldset.Content>
           </Fieldset.Root>
@@ -219,7 +246,6 @@ const EditProfile = ({ user }) => {
                     bgGradient="linear(to-r, teal.500, green.500)"
                     paddingX="4"
                     borderColor="gray.600"
-                    variant={"subtle"}
                     _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
                   />
                 </div>
@@ -229,22 +255,20 @@ const EditProfile = ({ user }) => {
         </GridItem>
       </Grid>
 
+      {/* Submit Button */}
       <Button
-        mt="8"
-        colorScheme="blue"
         onClick={handleSubmit}
         isLoading={loading}
-        loadingText="Updating..."
-        width="full"
+        loadingText="Saving"
+        colorScheme="green"
         size="lg"
-        bg="blue.600"
-        _hover={{ bg: "blue.700" }}
+        width="100%"
+        mt="4"
       >
         Save Changes
       </Button>
     </Box>
   );
-
   function getIconForHandle(handle) {
     switch (handle) {
       case "facebook":

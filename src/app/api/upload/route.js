@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../../../libs/cloudinary';
+import cloudinary from '../../../libs/cloudinary'; // Assuming you have cloudinary setup
 import nextConnect from 'next-connect';
 
 const storage = new CloudinaryStorage({
@@ -16,7 +16,7 @@ const upload = multer({ storage });
 
 const apiRoute = nextConnect();
 
-apiRoute.use(upload.single('file'));
+apiRoute.use(upload.single('file')); // 'file' is the name of the form field
 
 export const config = {
   api: {
@@ -31,9 +31,9 @@ export async function POST(req) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const { path, filename } = file;
+    const { secure_url, public_id } = file; // Extract the secure URL from Cloudinary
 
-    return NextResponse.json({ url: path, public_id: filename }, { status: 200 });
+    return NextResponse.json({ url: secure_url, public_id }, { status: 200 }); // Return the URL
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

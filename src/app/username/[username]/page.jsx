@@ -10,6 +10,7 @@ import {
   Twitter,
   Youtube,
 } from "lucide-react";
+import Link from "next/link";
 
 const UserProfilePage = () => {
   const { username } = useParams();
@@ -63,7 +64,7 @@ const UserProfilePage = () => {
         transition={{ type: "spring", stiffness: 120 }}
       >
         <img
-          src={userData.profilePicture || "/default-profile-picture.png"}
+          src={userData.profilePicture || "/default-profile-picture.png"} // If no image, show default
           alt="Profile"
           className="w-full h-full object-cover"
         />
@@ -116,14 +117,14 @@ const UserProfilePage = () => {
         {Object.entries(userData.socialMediaHandles).map(([platform, url]) => (
           url && (
             <li key={platform}>
-              <a
+              <Link
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition"
               >
                 {iconMap[platform.toLowerCase()]}
-              </a>
+              </Link>
             </li>
           )
         ))}
