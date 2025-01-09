@@ -11,7 +11,7 @@ const poppins = Poppins({
   weight: ['400', '600', '700'],
 })
 
-const Signin = () => {
+const  Signin = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -29,7 +29,8 @@ const Signin = () => {
     if (res?.error) {
       setError(res.error)
     } else {
-      router.push("/") // Redirect to home page on successful login
+     
+      router.push(`/`); // Redirect to home page on successful login
     }
   }
 

@@ -45,7 +45,7 @@ const signUp = async (
   try {
     const savedUser = await newUser.save();
     console.log('User saved:', savedUser);
-    return savedUser;
+    return savedUser.username;
   } catch (err) {
     console.log('Error saving user:', err);
     throw err; // You can rethrow or handle the error as needed
@@ -107,6 +107,7 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user._id;
+        token.username=user.username;
       }
       return token;
     },

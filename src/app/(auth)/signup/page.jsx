@@ -31,7 +31,7 @@ const Signup = () => {
     if (res?.error) {
       setError(res.error)
     } else {
-      router.push({${`/username/${usernaem}`}}) // Redirect to home page on successful signup
+      router.push(`/username/${username}`); // Redirect to home page on successful signup
     }
   }
 
