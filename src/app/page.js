@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'  // Import useSession from NextAuth
 import Link from 'next/link'
 import { Poppins } from 'next/font/google'
 
@@ -18,13 +19,14 @@ const gradients = [
 
 export default function LandingPage() {
   const [currentGradient, setCurrentGradient] = useState(0)
+  const { data: session } = useSession()  // Access the session to check if the user is logged in
 
   const changeGradient = () => {
     setCurrentGradient((prev) => (prev + 1) % gradients.length)
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${gradients[currentGradient]} flex flex-col items-center justify-center p-4 ${poppins.className}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${gradients[currentGradient]} flex flex-col items-center justify-center p-4 ${poppins.className}`} onClick={changeGradient}>
       <div className="glassmorphism-card max-w-2xl w-full text-center p-8 rounded-3xl">
         <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
           Link<span className="text-yellow-300">Nest</span>
@@ -32,15 +34,20 @@ export default function LandingPage() {
         <p className="text-xl md:text-2xl mb-8 text-white">
           One link to rule them all.
         </p>
-        <Link href="/signup" className="btn-primary">
-          Create Your LinkNest
-        </Link>
+        {!session ? (
+          <Link href="/signup" className="btn-primary">
+            Create Your LinkNest
+          </Link>
+        ) : (
+          <Link href="/dashboard" className="btn-primary">
+            Go to Dashboard
+          </Link>
+        )}
       </div>
       
-      <button onClick={changeGradient} className="mt-8 btn-secondary">
+      <button  className="mt-8 btn-secondary">
         Change Background
       </button>
     </div>
   )
 }
-
