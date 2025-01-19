@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import toast from 'react-hot-toast';
+ import { Toaster } from 'react-hot-toast';
 const EditLinks = ({ user }) => {
   const [links, setLinks] = useState(user.links || []);
   const [newLink, setNewLink] = useState({ title: '', url: '', icon: '' });
@@ -14,7 +15,7 @@ const EditLinks = ({ user }) => {
   const handleSaveLink = () => {
     const { title, url, icon } = newLink;
     if (!title.trim() || !url.trim()) {
-      alert('Please fill in both Title and URL');
+      toast.error('Please fill in both Title and URL');
       return;
     }
 
@@ -28,7 +29,7 @@ const EditLinks = ({ user }) => {
     };
 
     if (!isValidURL(url)) {
-      alert('Please enter a valid URL');
+      toast.error('Please enter a valid URL');
       return;
     }
 
@@ -70,10 +71,10 @@ const EditLinks = ({ user }) => {
         throw new Error(data.error || 'Failed to update links');
       }
 
-      alert('Links updated successfully');
+      toast.success('Links updated successfully');
     } catch (error) {
       console.error('Error updating links:', error.message);
-      alert(`Error updating links: ${error.message}`);
+      toast.error(`Error updating links: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -81,6 +82,7 @@ const EditLinks = ({ user }) => {
 
   return (
     <div className="text-white">
+      
       <h2 className="text-2xl font-semibold mb-6">Your Links</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

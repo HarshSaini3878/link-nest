@@ -7,6 +7,7 @@ import EditLinks from '../../components/component/Editlinks';
 import EditProfile from '../../components/component/EditProfile';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
+import toast, { Toaster } from 'react-hot-toast';
 
 const poppins = Poppins({
   weight: ['400', '600', '700'],
@@ -65,14 +66,23 @@ export default function Dashboard() {
       const profileUrl = `http://localhost:3000/username/${encodedUsername}`;
       navigator.clipboard.writeText(profileUrl)
         .then(() => {
-          alert('Profile link copied to clipboard!');
+          toast('Profile link copied to clipboard',
+            {
+              icon: '👏',
+              style: {
+                borderRadius: '10px',
+                background: '#333',
+                color: '#fff',
+              },
+            }
+          );
         })
         .catch(err => {
           console.error('Error copying to clipboard:', err);
-          alert('Failed to copy profile link');
+          toast.error('Failed to copy profile link');
         });
     } else {
-      alert('Username not found');
+      toast.error('Username not found');
     }
   };
 
@@ -98,6 +108,7 @@ export default function Dashboard() {
   }
   return (
     <div className={`min-h-screen bg-gradient-to-br from-pink-500 to-red-400 flex justify-center items-start p-8 ${poppins.className}`}>
+      <Toaster/>
       <div className="w-full max-w-2xl flex flex-col items-center">
         <h1 className="text-4xl font-bold text-white mb-8 tracking-tight">
           Welcome to your Dashboard!

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Cuprum, Poppins } from 'next/font/google';
 import { useBackground } from "../../../context/BackgroundContext";
 import NotFoundPage from "../../../components/component/not-found";
-
+import {Toaster,toast} from "react-hot-toast"
 const poppins = Poppins({
   weight: ['400', '600', '700'],
   subsets: ['latin'],
@@ -60,7 +60,7 @@ console.log(currentGradient)
 
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-4 ${poppins.className}`}>
-      <AnimatePresence>
+      <Toaster/><AnimatePresence>
         {loading ? (
           <motion.div
             key="loading"

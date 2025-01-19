@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const EditProfile = ({ user }) => {
   const [profileData, setProfileData] = useState({
@@ -79,7 +80,7 @@ const EditProfile = ({ user }) => {
         }
       } catch (error) {
         console.error('Error uploading profile picture:', error);
-        alert('Failed to upload profile picture');
+        toast.error('Failed to upload profile picture');
       }
     }
   };
@@ -102,13 +103,13 @@ const EditProfile = ({ user }) => {
 
       const data = await response.json();
       if (response.ok) {
-        alert('Profile updated successfully');
+        toast.success('Profile updated successfully');
       } else {
-        alert(data.error || 'Failed to update profile');
+        toast.error(data.error || 'Failed to update profile');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('An error occurred while updating profile');
+      toast.error('An error occurred while updating profile');
     } finally {
       setLoading(false);
     }
@@ -116,6 +117,7 @@ const EditProfile = ({ user }) => {
 
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+     
       <h2 className="text-2xl font-semibold text-white mb-4">Edit Profile</h2>
 
       <div className="flex flex-col">
