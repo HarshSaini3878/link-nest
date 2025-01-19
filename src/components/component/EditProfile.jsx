@@ -152,7 +152,7 @@ const EditProfile = ({ user }) => {
           value={profileData.bio}
           onChange={handleInputChange}
           className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300 resize-y min-h-[100px]"
-          maxLength={160}
+          maxLength={200}
         />
       </div>
 

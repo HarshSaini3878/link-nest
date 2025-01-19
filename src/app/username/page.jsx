@@ -3,11 +3,11 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Facebook, Github, Linkedin, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Facebook, Github, Linkedin, Instagram, Twitter, Youtube,  SkipBack  } from 'lucide-react'; // Import Exit icon from lucide-react
 import Link from "next/link";
-import { Cuprum, Poppins } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import { useSession } from "next-auth/react";
-import NotFoundPage from "../../components/component/not-found"
+import NotFoundPage from "../../components/component/not-found";
 
 const poppins = Poppins({
   weight: ['400', '600', '700'],
@@ -57,6 +57,18 @@ const UserProfilePage = () => {
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-4 ${poppins.className}`}>
       <AnimatePresence>
+        {/* Exit Button */}
+        <Link href="/dashboard">
+          <motion.button
+            className="absolute top-4 right-4 w-12 h-12 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-black transition duration-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            < SkipBack  className="w-6 h-6" />
+          </motion.button>
+        </Link>
+
         {loading ? (
           <motion.div
             key="loading"
@@ -68,7 +80,7 @@ const UserProfilePage = () => {
             Loading...
           </motion.div>
         ) : error ? (
-          <><NotFoundPage/></>
+          <><NotFoundPage /></>
         ) : userData ? (
           <motion.div
             key="profile"
@@ -135,13 +147,23 @@ const UserProfilePage = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-center font-semibold hover:from-purple-600 hover:to-pink-600 transition duration-300 shadow-md"
+                  className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-center font-semibold hover:from-purple-600 hover:to-pink-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
                   variants={{
                     hidden: { opacity: 0, y: 10 },
                     visible: { opacity: 1, y: 0 },
                   }}
                 >
-                  {link.title}
+                  {/* Render icon as an image */}
+                  {link.icon && (
+                    <span className="mr-2">
+                      <img
+                        src={link.icon}
+                        alt={`${link.title} icon`}
+                        className="w-5 h-5 object-contain" // Adjust size as needed
+                      />
+                    </span>
+                  )}
+                  {link.title} {/* Display the link title */}
                 </motion.a>
               ))}
             </motion.div>
@@ -164,7 +186,7 @@ const UserProfilePage = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-300"
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-black transition duration-300"
                     >
                       {iconMap[platform.toLowerCase()]}
                     </Link>

@@ -133,21 +133,32 @@ console.log(currentGradient)
                 },
               }}
             >
-              {userData.links.map((link, index) => (
+           {userData.links.map((link, index) => (
                 <motion.a
                   key={index}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-center font-semibold hover:from-purple-600 hover:to-pink-600 transition duration-300 shadow-md"
+                  className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-center font-semibold hover:from-purple-600 hover:to-pink-600 transition duration-300 shadow-md flex items-center justify-center gap-2"
                   variants={{
                     hidden: { opacity: 0, y: 10 },
                     visible: { opacity: 1, y: 0 },
                   }}
                 >
-                  {link.title}
+                  {/* Render icon as an image */}
+                  {link.icon && (
+                    <span className="mr-2">
+                      <img
+                        src={link.icon}
+                        alt={`${link.title} icon`}
+                        className="w-5 h-5 object-contain" // Adjust size as needed
+                      />
+                    </span>
+                  )}
+                  {link.title} {/* Display the link title */}
                 </motion.a>
               ))}
+
             </motion.div>
 
             {/* Social Media Handles */}
@@ -168,7 +179,7 @@ console.log(currentGradient)
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-300"
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-black transition duration-300"
                     >
                       {iconMap[platform.toLowerCase()]}
                     </Link>
