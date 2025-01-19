@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import EditLinks from '../../components/component/Editlinks';
 import EditProfile from '../../components/component/EditProfile';
 import { Poppins } from 'next/font/google';
+import Link from 'next/link';
 
 const poppins = Poppins({
   weight: ['400', '600', '700'],
@@ -57,7 +58,24 @@ export default function Dashboard() {
     }
   }, [session, status]);
   
-  
+  const handleShareClick = () => {
+    if (user.username) {
+      // Directly encode the username
+      const encodedUsername = encodeURIComponent(user.username); // Encode the username
+      const profileUrl = `http://localhost:3000/username/${encodedUsername}`;
+      navigator.clipboard.writeText(profileUrl)
+        .then(() => {
+          alert('Profile link copied to clipboard!');
+        })
+        .catch(err => {
+          console.error('Error copying to clipboard:', err);
+          alert('Failed to copy profile link');
+        });
+    } else {
+      alert('Username not found');
+    }
+  };
+
 
   if (status === 'loading') {
     console.log("Session is loading...");
@@ -96,6 +114,7 @@ export default function Dashboard() {
           >
             Edit Profile
           </button>
+         
           <button
             className={`px-6 py-3 text-lg font-semibold rounded-lg cursor-pointer transition-all duration-300 ${
               isEditingLinks
@@ -105,6 +124,20 @@ export default function Dashboard() {
             onClick={() => setIsEditingLinks(true)}
           >
             Edit Links
+          </button>
+          <Link href={"/username"}>
+          <button
+            className={`px-6 py-3 text-lg font-semibold rounded-lg bg-black cursor-pointer transition-all duration-300`}
+            
+          >
+            go to profile 👉
+          </button>
+          </Link>
+          <button
+            className={`px-6 py-3 text-lg font-semibold rounded-lg bg-black cursor-pointer transition-all duration-300`}
+            onClick={handleShareClick}
+          >
+            share Profile
           </button>
         </div>
 
