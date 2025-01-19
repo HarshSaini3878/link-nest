@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
+// Default social media handles
 const defaultSocialMediaHandles = {
   facebook: '',
   Github: '',
@@ -13,6 +14,7 @@ const defaultSocialMediaHandles = {
   Youtube: '',
 };
 
+// Sign-up function to create a new user
 const signUp = async (
   email,
   password,
@@ -45,17 +47,14 @@ const signUp = async (
   try {
     const savedUser = await newUser.save();
     console.log('User saved:', savedUser);
-    return savedUser.username;
+    return savedUser; // Return full user object instead of just username
   } catch (err) {
     console.log('Error saving user:', err);
     throw err; // You can rethrow or handle the error as needed
   }
 };
 
-
-
-
-
+// NextAuth options
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -73,7 +72,11 @@ export const authOptions = {
           // If username is provided, proceed with signup
           if (credentials?.username) {
             // Signup process
-            return await signUp(credentials.email, credentials.password, credentials.username);
+            return await signUp(
+              credentials.email,
+              credentials.password,
+              credentials.username
+            );
           }
 
           // If no username is provided, proceed with signin (login)
@@ -93,7 +96,7 @@ export const authOptions = {
             throw new Error("Invalid email or password");
           }
 
-          return user; // Return user if authenticated
+          return user; // Return full user object if authenticated
         } catch (error) {
           throw new Error(error.message || "Error during authentication");
         }
@@ -107,13 +110,14 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user._id;
-        token.username=user.username;
+        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token?.id) {
+      if (token?.id && token?.username) {
         session.user.id = token.id;
+        session.user.username = token.username;
       }
       return session;
     },
