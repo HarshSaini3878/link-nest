@@ -2,7 +2,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
-import { Provider } from "../components/ui/provider"
+import { Provider } from "../components/ui/provider";
+import { BackgroundProvider } from '../context/BackgroundContext'; // Import BackgroundProvider
 
 // Import Google Fonts
 const geistSans = Geist({
@@ -15,17 +16,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
-
 export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Wrap the entire app in the SessionProvider */}
+        {/* Wrap the entire app in the SessionProvider and BackgroundProvider */}
         <SessionProvider>
-        <Provider>{children}</Provider>
+          <BackgroundProvider> {/* Apply BackgroundProvider here */}
+            <Provider>{children}</Provider>
+          </BackgroundProvider>
         </SessionProvider>
       </body>
     </html>

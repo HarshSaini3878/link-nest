@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Facebook, Github, Linkedin, Instagram, Twitter, Youtube } from 'lucide-react';
 import Link from "next/link";
-import { Poppins } from 'next/font/google';
+import { Cuprum, Poppins } from 'next/font/google';
+import { useBackground } from "../../../context/BackgroundContext";
 
 const poppins = Poppins({
   weight: ['400', '600', '700'],
@@ -19,7 +20,7 @@ const UserProfilePage = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+const { currentGradient,gradients} = useBackground();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -43,6 +44,9 @@ const UserProfilePage = () => {
       fetchUserData();
     }
   }, [username]);
+  useEffect(()=>{
+console.log(currentGradient)
+  },[currentGradient])
 
   const iconMap = {
     facebook: <Facebook className="w-5 h-5" />,
