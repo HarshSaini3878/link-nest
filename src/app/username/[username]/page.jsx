@@ -7,6 +7,7 @@ import { Facebook, Github, Linkedin, Instagram, Twitter, Youtube } from 'lucide-
 import Link from "next/link";
 import { Cuprum, Poppins } from 'next/font/google';
 import { useBackground } from "../../../context/BackgroundContext";
+import NotFoundPage from "../../../components/component/not-found";
 
 const poppins = Poppins({
   weight: ['400', '600', '700'],
@@ -71,15 +72,7 @@ console.log(currentGradient)
             Loading...
           </motion.div>
         ) : error ? (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-white text-2xl font-semibold bg-red-600 px-6 py-3 rounded-lg shadow-lg"
-          >
-            {error}
-          </motion.div>
+         <NotFoundPage/>
         ) : userData ? (
           <motion.div
             key="profile"
