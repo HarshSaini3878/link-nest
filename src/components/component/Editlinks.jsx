@@ -1,32 +1,8 @@
-"use client";
-
-import React, { useState } from "react";
-import {
-  Button,
-  Input,
-  Text,
-  VStack,
-  Flex,
-  IconButton,
-  Spinner,
-  Image,
-} from "@chakra-ui/react";
-import { Plus, Pencil, Trash, LinkIcon, CrossIcon, UtensilsCrossed } from "lucide-react";
-import { Toaster, toaster } from "../ui/toaster";
-import {
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogRoot,
-  DialogTrigger,
-} from "../ui/dialog";
+import React, { useState } from 'react';
 
 const EditLinks = ({ user }) => {
   const [links, setLinks] = useState(user.links || []);
-  const [newLink, setNewLink] = useState({ title: "", url: "", icon: "" });
+  const [newLink, setNewLink] = useState({ title: '', url: '', icon: '' });
   const [editingIndex, setEditingIndex] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -35,14 +11,10 @@ const EditLinks = ({ user }) => {
     setNewLink({ ...newLink, [name]: value });
   };
 
-  const showToast = (description, type = "info") => {
-    toaster.create({ description, type });
-  };
-
   const handleSaveLink = () => {
     const { title, url, icon } = newLink;
     if (!title.trim() || !url.trim()) {
-      showToast("Please fill in both Title and URL", "warning");
+      alert('Please fill in both Title and URL');
       return;
     }
 
@@ -56,7 +28,7 @@ const EditLinks = ({ user }) => {
     };
 
     if (!isValidURL(url)) {
-      showToast("Please enter a valid URL", "warning");
+      alert('Please enter a valid URL');
       return;
     }
 
@@ -68,14 +40,12 @@ const EditLinks = ({ user }) => {
         : [...links, { title: title.trim(), url: url.trim(), icon: icon.trim() }];
 
     setLinks(updatedLinks);
-    setNewLink({ title: "", url: "", icon: "" });
+    setNewLink({ title: '', url: '', icon: '' });
     setEditingIndex(null);
-    showToast(editingIndex !== null ? "Link updated" : "New link added", "success");
   };
 
   const handleRemoveLink = (index) => {
     setLinks(links.filter((_, i) => i !== index));
-    showToast("Link removed", "info");
   };
 
   const handleEditLink = (index) => {
@@ -83,191 +53,115 @@ const EditLinks = ({ user }) => {
     setNewLink({ ...links[index] });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (loading) return;
 
     setLoading(true);
     try {
-      const response = await fetch("/api/user/updateLinks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/user/updateLinks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user._id, links }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to update links");
+        throw new Error(data.error || 'Failed to update links');
       }
 
-      showToast("Links updated successfully", "success");
+      alert('Links updated successfully');
     } catch (error) {
-      console.error("Error updating links:", error.message);
-      showToast(`Error updating links: ${error.message}`, "error");
+      console.error('Error updating links:', error.message);
+      alert(`Error updating links: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Flex
-      justify="center"
-      align="center"
-      h="100vh"
-      bgGradient="linear(to-r, green.400, blue.500)"
-    >
-      <div
-        style={{
-          maxWidth: "40rem",
-          width: "100%",
-          padding: "2rem",
-          background: "rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "16px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          color: "white",
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-        }}
-      >
-        <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb="6" color="white">
-          Your Links
-        </Text>
-        <Toaster />
+    <div className="text-white">
+      <h2 className="text-2xl font-semibold mb-6">Your Links</h2>
 
-        <DialogRoot>
-          <DialogTrigger asChild>
-            <IconButton
-              bg="blue.500"
-              color="white"
-              _hover={{ bg: "blue.600" }}
-              mb="4"
-              w="full"
-              onClick={() => setEditingIndex(null)} // Create new link
-            >
-              <Plus /> Add New Link
-            </IconButton>
-          </DialogTrigger>
-
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingIndex !== null ? "Edit Link" : "Add Link"}</DialogTitle>
-            </DialogHeader>
-            <DialogBody>
-              <VStack spacing="4">
-                <Input
-                  placeholder="Title"
-                  name="title"
-                  value={newLink.title}
-                  onChange={handleInputChange}
-                />
-                <Input
-                  placeholder="URL"
-                  name="url"
-                  value={newLink.url}
-                  onChange={handleInputChange}
-                />
-                <Input
-                  placeholder="Icon URL (optional)"
-                  name="icon"
-                  value={newLink.icon}
-                  onChange={handleInputChange}
-                />
-              </VStack>
-            </DialogBody>
-            <DialogFooter>
-              <IconButton
-                bg="blue.500"
-                color="white"
-                _hover={{ bg: "blue.600" }}
-                onClick={handleSaveLink}
-              >
-                Save
-              </IconButton>
-              <DialogCloseTrigger asChild={true}>
-  <IconButton
-    variant="ghost"
-    aria-label="Close"
-    size="sm"
-    position="absolute"
-    top="2"
-    insetEnd="2"
-  >
-    <UtensilsCrossed color="#de1212" absoluteStrokeWidth />
-  </IconButton>
-</DialogCloseTrigger>
-
-            </DialogFooter>
-          </DialogContent>
-        </DialogRoot>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
+          <input
+            type="text"
+            name="title"
+            value={newLink.title}
+            onChange={handleInputChange}
+            placeholder="Link Title"
+            className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+          />
+          <input
+            type="text"
+            name="url"
+            value={newLink.url}
+            onChange={handleInputChange}
+            placeholder="URL"
+            className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+          />
+          <input
+            type="text"
+            name="icon"
+            value={newLink.icon}
+            onChange={handleInputChange}
+            placeholder="Icon URL (optional)"
+            className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+          />
+          <button
+            type="button"
+            onClick={handleSaveLink}
+            className="py-3 px-6 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors duration-300"
+          >
+            {editingIndex !== null ? 'Update Link' : 'Add Link'}
+          </button>
+        </div>
 
         {links.length === 0 ? (
-          <Text color="gray.400" textAlign="center">
-            No links added yet. Click "Add New Link" to get started!
-          </Text>
+          <p className="text-center text-white/70 mt-4">No links added yet. Add your first link above!</p>
         ) : (
-          <VStack spacing="4">
+          <ul className="list-none p-0 mt-6 space-y-3">
             {links.map((link, index) => (
-              <Flex
-                key={index}
-                p="4"
-                bg="rgba(255, 255, 255, 0.2)"
-                backdropFilter="blur(5px)"
-                rounded="md"
-                w="full"
-                justify="space-between"
-                align="center"
-                border="1px solid rgba(255, 255, 255, 0.2)"
-              >
-                <Flex align="center" gap="2">
-                  {link.icon ? (
-                    <Image src={link.icon} alt={link.title} boxSize="6" />
-                  ) : (
-                    <LinkIcon />
-                  )}
-                  <Text as="a" href={link.url} color="blue.300" target="_blank">
+              <li key={index} className="flex justify-between items-center p-4 bg-white/10 rounded-lg transition-all duration-300 hover:bg-white/20">
+                <div className="flex items-center gap-3">
+                  {link.icon && <img src={link.icon || "/placeholder.svg"} alt="" className="w-8 h-8 object-cover rounded-full" />}
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 transition-colors duration-300">
                     {link.title}
-                  </Text>
-                </Flex>
-                <Flex gap="2">
-                  <IconButton
-                    size="sm"
-                    bg="blue.500"
-                    color="white"
-                    _hover={{ bg: "blue.600" }}
+                  </a>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
                     onClick={() => handleEditLink(index)}
+                    className="py-2 px-4 rounded-lg bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition-colors duration-300"
                   >
-                    <Pencil />
-                  </IconButton>
-                  <IconButton
-                    size="sm"
-                    bg="red.500"
-                    color="white"
-                    _hover={{ bg: "red.600" }}
+                    Edit
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => handleRemoveLink(index)}
-                    aria-label="Delete link"
+                    className="py-2 px-4 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors duration-300"
                   >
-                    <Trash />
-                  </IconButton>
-                </Flex>
-              </Flex>
+                    Remove
+                  </button>
+                </div>
+              </li>
             ))}
-          </VStack>
+          </ul>
         )}
 
-        <Button
-          bg="green.500"
-          color="white"
-          _hover={{ bg: "green.600" }}
-          onClick={handleSubmit}
-          isLoading={loading}
-          loadingText="Updating..."
-          w="full"
-          mt="6"
+        <button
+          type="submit"
+          className="mt-6 py-3 px-6 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-300 disabled:bg-blue-400 disabled:cursor-not-allowed"
+          disabled={loading}
         >
-          Save All Links
-        </Button>
-      </div>
-    </Flex>
+          {loading ? 'Saving...' : 'Save All Links'}
+        </button>
+      </form>
+    </div>
   );
 };
 
 export default EditLinks;
+

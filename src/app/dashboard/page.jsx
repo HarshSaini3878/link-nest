@@ -3,26 +3,28 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Button, Spinner, Box, Text } from '@chakra-ui/react'; // Chakra UI for buttons and spinner
-import Editlinks from '../../components/component/Editlinks'; // Import EditLinks component
-import EditProfile from '../../components/component/EditProfile'; // Import EditProfile component
+import EditLinks from '../../components/component/Editlinks';
+import EditProfile from '../../components/component/EditProfile';
+import { Poppins } from 'next/font/google';
+
+const poppins = Poppins({
+  weight: ['400', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 export default function Dashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  
+
   const [user, setUser] = useState({});
-  const [isEditingLinks, setIsEditingLinks] = useState(false); // State to toggle between edit sections
-  
-  // Fetch user data if logged in
+  const [isEditingLinks, setIsEditingLinks] = useState(false);
+
   useEffect(() => {
-    
     if (status === 'authenticated' && session?.user) {
       const fetchUserData = async () => {
         try {
           const userId = session.user.id;
-             console.log(session,"session")
-          // Make an API call to fetch user info
           const response = await fetch(`/api/user/getUserInfo?userId=${userId}`);
 
           if (!response.ok) {
@@ -30,7 +32,6 @@ export default function Dashboard() {
           }
 
           const data = await response.json();
-        console.log(data)
           if (data.success) {
             setUser(data.user);
           } else {
@@ -47,8 +48,8 @@ export default function Dashboard() {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <Spinner size="xl" color="teal.500" />
+      <div className={`flex justify-center items-center h-screen bg-gradient-to-br from-pink-500 to-red-400 ${poppins.className}`}>
+        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -58,51 +59,45 @@ export default function Dashboard() {
     return null;
   }
 
-  const handleToggleEditLinks = () => {
-    setIsEditingLinks(true); // Show EditLinks
-  };
-
-  const handleToggleEditProfile = () => {
-    setIsEditingLinks(false); // Show EditProfile
-  };
-
   return (
-    <div className="p-6 bg-gray-800 text-white min-h-screen">
-      <Box textAlign="center" mb="8">
-        <Text fontSize="2xl" fontWeight="bold">Welcome to your Dashboard!</Text>
-      </Box>
+    <div className={`min-h-screen bg-gradient-to-br from-pink-500 to-red-400 flex justify-center items-start p-8 ${poppins.className}`}>
+      <div className="w-full max-w-2xl flex flex-col items-center">
+        <h1 className="text-4xl font-bold text-white mb-8 tracking-tight">
+          Welcome to your Dashboard!
+        </h1>
 
-      <div className="mt-8">
-        {isEditingLinks ? (
-          // Show EditLinks component
-          <Editlinks user={user} />
-        ) : (
-          // Show EditProfile component
-          <EditProfile user={user} />
-        )}
-      </div>
+        <div className="flex gap-4 mb-8">
+          <button
+            className={`px-6 py-3 text-lg font-semibold rounded-lg cursor-pointer transition-all duration-300 ${
+              !isEditingLinks
+                ? 'bg-green-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1'
+                : 'bg-white/20 text-white/80 hover:bg-white/30'
+            }`}
+            onClick={() => setIsEditingLinks(false)}
+          >
+            Edit Profile
+          </button>
+          <button
+            className={`px-6 py-3 text-lg font-semibold rounded-lg cursor-pointer transition-all duration-300 ${
+              isEditingLinks
+                ? 'bg-green-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1'
+                : 'bg-white/20 text-white/80 hover:bg-white/30'
+            }`}
+            onClick={() => setIsEditingLinks(true)}
+          >
+            Edit Links
+          </button>
+        </div>
 
-      {/* Toggle Buttons */}
-      <div className="mt-8 space-x-4 flex justify-center">
-        <Button
-          colorScheme="teal"
-          onClick={handleToggleEditProfile}
-          width="200px"
-          variant={isEditingLinks ? 'ghost' : 'solid'}
-          _hover={{ bg: 'teal.600' }}
-        >
-          Edit Profile
-        </Button>
-        <Button
-          colorScheme="blue"
-          onClick={handleToggleEditLinks}
-          width="200px"
-          variant={isEditingLinks ? 'solid' : 'ghost'}
-          _hover={{ bg: 'blue.600' }}
-        >
-          Edit Links
-        </Button>
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg p-8 w-full shadow-2xl">
+          {isEditingLinks ? (
+            <EditLinks user={user} />
+          ) : (
+            <EditProfile user={user} />
+          )}
+        </div>
       </div>
     </div>
   );
 }
+

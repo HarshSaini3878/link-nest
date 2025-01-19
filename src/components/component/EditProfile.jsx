@@ -1,292 +1,202 @@
-import React, { useEffect, useState } from "react";
-import { Box, Button, Input, VStack, Text, Fieldset, IconButton, Grid, GridItem, Textarea, Image } from "@chakra-ui/react";
-import { Toaster, toaster } from "../ui/toaster";
-import { Separator } from "@chakra-ui/react";
-import { Field } from "../ui/field";
-import { FaFacebook, FaGithub, FaLinkedin, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+"use client"
+import React, { useState, useEffect } from 'react';
 
 const EditProfile = ({ user }) => {
   const [profileData, setProfileData] = useState({
-    username: user.username || "",
-    email: user.email || "",
-    bio: user.bio || "",
-    profilePicture: user.profilePicture || "",
-    socialMediaHandles: user.socialMediaHandles || {
-      facebook: "",
-      Github: "",
-      Linkedin: "",
-      Instagram: "",
-      Twitter: "",
-      Youtube: "",
+    username: '',
+    email: '',
+    bio: '',
+    profilePicture: '',
+    socialMediaHandles: {
+      facebook: '',
+      github: '',
+      linkedin: '',
+      instagram: '',
+      twitter: '',
+      youtube: '',
     },
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       setProfileData({
-        username: user.username || "",
-        email: user.email || "",
-        bio: user.bio || "",
-        profilePicture: user.profilePicture || "",
+        username: user.username || '',
+        email: user.email || '',
+        bio: user.bio || '',
+        profilePicture: user.profilePicture || '',
         socialMediaHandles: user.socialMediaHandles || {
-          facebook: "",
-          Github: "",
-          Linkedin: "",
-          Instagram: "",
-          Twitter: "",
-          Youtube: "",
+          facebook: '',
+          github: '',
+          linkedin: '',
+          instagram: '',
+          twitter: '',
+          youtube: '',
         },
       });
     }
   }, [user]);
 
-  const [loading, setLoading] = useState(false);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfileData({
-      ...profileData,
+    setProfileData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   const handleSocialMediaChange = (e) => {
     const { name, value } = e.target;
-    setProfileData({
-      ...profileData,
+    setProfileData((prevData) => ({
+      ...prevData,
       socialMediaHandles: {
-        ...profileData.socialMediaHandles,
+        ...prevData.socialMediaHandles,
         [name]: value,
       },
-    });
+    }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Here, you can handle the file upload to your server or a service like Cloudinary
-      uploadProfilePicture(file);
-    }
-  };
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'LinkNest');
+        formData.append('folder', 'user_images');
 
-  const uploadProfilePicture = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);  // The file you want to upload
-    formData.append("upload_preset", "LinkNest");  // The name of your unsigned upload preset
-    formData.append("folder", "user_images"); // replace with your Cloudinary preset
-
-    try {
-      const response = await fetch("https://api.cloudinary.com/v1_1/dskfkk0wf/image/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (data.secure_url) {
-        setProfileData({
-          ...profileData,
-          profilePicture: data.secure_url,
+        const response = await fetch('https://api.cloudinary.com/v1_1/dskfkk0wf/image/upload', {
+          method: 'POST',
+          body: formData,
         });
+
+        const data = await response.json();
+        if (data.secure_url) {
+          setProfileData((prevData) => ({
+            ...prevData,
+            profilePicture: data.secure_url,
+          }));
+        }
+      } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        alert('Failed to upload profile picture');
       }
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      showToast("Failed to upload profile picture", "error");
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (loading) return;
     setLoading(true);
     try {
-      // Ensure profileData has the latest profilePicture URL after upload
-      const response = await fetch("/api/user/updateProfile", {
-        method: "POST",
+      const response = await fetch('/api/user/updateProfile', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId: user._id,
-          profileData,  // Passing the full profileData including profilePicture URL
+          profileData,
         }),
       });
-  
+
       const data = await response.json();
       if (response.ok) {
-        showToast("Profile updated successfully", "success");
+        alert('Profile updated successfully');
       } else {
-        showToast(data.error || "Failed to update profile", "error");
+        alert(data.error || 'Failed to update profile');
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      showToast("An error occurred while updating profile", "error");
+      console.error('Error updating profile:', error);
+      alert('An error occurred while updating profile');
     } finally {
       setLoading(false);
     }
   };
-  
-
-  const showToast = (description, type = "info") => {
-    toaster.create({ description, type });
-  };
 
   return (
-    <Box maxW="4xl" mx="auto" p="6" bg="gray.900" color="white" borderRadius="lg" boxShadow="xl">
-      <Text fontSize="3xl" fontWeight="bold" textAlign="center" mb="6">
-        Edit Profile
-      </Text>
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+      <h2 className="text-2xl font-semibold text-white mb-4">Edit Profile</h2>
 
-      {/* Personal Information Section */}
-      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap="6" mb="8">
-        <GridItem>
-          <Fieldset.Root>
-            <Fieldset.Legend fontSize="lg" fontWeight="semibold" color="gray.200">
-              Personal Information
-            </Fieldset.Legend>
-            <Fieldset.Content>
-              <div>
-                <Field label htmlFor="username" style={{ display: "block", fontWeight: "normal" }}>
-                  Username
-                </Field>
-                <Input
-                  id="username"
-                  name="username"
-                  value={profileData.username}
-                  onChange={handleInputChange}
-                  placeholder="Enter your username"
-                  bgGradient="linear(to-r, teal.500, green.500)"
-                  paddingX="4"
-                  borderColor="gray.600"
-                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
-                />
-              </div>
+      <div className="flex flex-col">
+        <label htmlFor="username" className="text-white mb-2 font-medium">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value={profileData.username}
+          onChange={handleInputChange}
+          className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+          required
+        />
+      </div>
 
-              <div>
-                <Field label htmlFor="email" style={{ display: "block", fontWeight: "normal" }}>
-                  Email
-                </Field>
-                <Input
-                  id="email"
-                  name="email"
-                  value={profileData.email}
-                  onChange={handleInputChange}
-                  placeholder="Email"
-                  bgGradient="linear(to-r, teal.500, green.500)"
-                  paddingX="4"
-                  borderColor="gray.600"
-                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
-                />
-              </div>
+      <div className="flex flex-col">
+        <label htmlFor="email" className="text-white mb-2 font-medium">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={profileData.email}
+          onChange={handleInputChange}
+          className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+          required
+        />
+      </div>
 
-              <div>
-                <Field label htmlFor="bio" style={{ display: "block", fontWeight: "normal" }}>
-                  Bio
-                </Field>
-                <Textarea
-                  id="bio"
-                  name="bio"
-                  value={profileData.bio}
-                  onChange={handleInputChange}
-                  placeholder="Write a short bio"
-                  maxLength="160"
-                  bgGradient="linear(to-r, teal.500, green.500)"
-                  paddingX="4"
-                  borderColor="gray.600"
-                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
-                  autoresize
-                  colorPalette={'red'}
-                />
-              </div>
+      <div className="flex flex-col">
+        <label htmlFor="bio" className="text-white mb-2 font-medium">Bio</label>
+        <textarea
+          id="bio"
+          name="bio"
+          value={profileData.bio}
+          onChange={handleInputChange}
+          className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300 resize-y min-h-[100px]"
+          maxLength={160}
+        />
+      </div>
 
-              <div>
-                <Field label htmlFor="profilePicture" style={{ display: "block", fontWeight: "normal" }}>
-                  Profile Picture
-                </Field>
-                <Input
-                  id="profilePicture"
-                  name="profilePicture"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  bgGradient="linear(to-r, teal.500, green.500)"
-                  paddingX="4"
-                  borderColor="gray.600"
-                  _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
-                  variant={"subtle"}
-                />
-                {profileData.profilePicture && (
-                  <Image src={profileData.profilePicture} alt="Profile Picture" boxSize="100px" objectFit="cover" mt="4" />
-                )}
-              </div>
-            </Fieldset.Content>
-          </Fieldset.Root>
-        </GridItem>
+      <div className="flex flex-col">
+        <label htmlFor="profilePicture" className="text-white mb-2 font-medium">Profile Picture</label>
+        <input
+          type="file"
+          id="profilePicture"
+          name="profilePicture"
+          onChange={handleFileChange}
+          className="p-3 border border-white/30 rounded-lg bg-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+          accept="image/*"
+        />
+        {profileData.profilePicture && (
+          <img src={profileData.profilePicture || "/placeholder.svg"} alt="Profile" className="w-24 h-24 object-cover rounded-full mt-4" />
+        )}
+      </div>
 
-        {/* Social Media Handles Section */}
-        <GridItem>
-          <Fieldset.Root>
-            <Fieldset.Legend fontSize="lg" fontWeight="semibold" color="gray.200">
-              Social Media Handles
-            </Fieldset.Legend>
-            <Fieldset.Content>
-              <Separator borderColor="gray.600" />
-              {Object.keys(profileData.socialMediaHandles).map((handle) => (
-                <div key={handle} style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-                  <IconButton aria-label={handle} bg="gray.700" borderColor="gray.600" size="sm" mr="4">
-                    {getIconForHandle(handle)}
-                  </IconButton>
-                  <Field label htmlFor={handle} style={{ display: "block", fontWeight: "normal" }}>
-                    {handle.charAt(0).toUpperCase() + handle.slice(1)}
-                  </Field>
-                  <Input
-                    id={handle}
-                    name={handle}
-                    value={profileData.socialMediaHandles[handle]}
-                    onChange={handleSocialMediaChange}
-                    placeholder={`${handle.charAt(0).toUpperCase() + handle.slice(1)} URL`}
-                    bgGradient="linear(to-r, teal.500, green.500)"
-                    paddingX="4"
-                    borderColor="gray.600"
-                    _focus={{ borderColor: "green.400", boxShadow: "0 0 0 1px #38A169" }}
-                  />
-                </div>
-              ))}
-            </Fieldset.Content>
-          </Fieldset.Root>
-        </GridItem>
-      </Grid>
+      <h3 className="text-xl font-semibold text-white mt-6 mb-4">Social Media Handles</h3>
+      {Object.keys(profileData.socialMediaHandles).map((platform) => (
+        <div key={platform} className="flex flex-col mb-4">
+          <label htmlFor={platform} className="text-white mb-2 font-medium capitalize">{platform}</label>
+          <input
+            type="text"
+            id={platform}
+            name={platform}
+            value={profileData.socialMediaHandles[platform]}
+            onChange={handleSocialMediaChange}
+            className="p-3 border border-white/30 rounded-lg bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+            placeholder={`${platform} URL`}
+          />
+        </div>
+      ))}
 
-      {/* Submit Button */}
-      <Button
-        onClick={handleSubmit}
-        isLoading={loading}
-        loadingText="Saving"
-        colorScheme="green"
-        size="lg"
-        width="100%"
-        mt="4"
+      <button 
+        type="submit" 
+        className="bg-green-500 text-white p-4 rounded-lg cursor-pointer text-lg font-semibold transition-all duration-300 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed mt-6"
+        disabled={loading}
       >
-        Save Changes
-      </Button>
-    </Box>
+        {loading ? 'Saving...' : 'Save Changes'}
+      </button>
+    </form>
   );
-  function getIconForHandle(handle) {
-    switch (handle) {
-      case "facebook":
-        return <FaFacebook size="24px" />;
-      case "Github":
-        return <FaGithub size="24px" />;
-      case "Linkedin":
-        return <FaLinkedin size="24px" />;
-      case "Instagram":
-        return <FaInstagram size="24px" />;
-      case "Twitter":
-        return <FaTwitter size="24px" />;
-      case "Youtube":
-        return <FaYoutube size="24px" />;
-      default:
-        return null;
-    }
-  }
 };
 
 export default EditProfile;
+
