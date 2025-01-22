@@ -26,7 +26,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${gradients[currentGradient]} flex flex-col items-center justify-center p-4 ${poppins.className}`} onClick={changeGradient}>
+    <div className={`min-h-screen bg-gradient-to-br ${gradients[currentGradient]} flex flex-col items-center justify-center p-4 ${poppins.className}`} >
       <div className="glassmorphism-card max-w-2xl w-full text-center p-8 rounded-3xl">
         <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
           Link<span className="text-yellow-300">Nest</span>
@@ -45,7 +45,7 @@ export default function LandingPage() {
         )}
       </div>
       
-      <button  className="mt-8 btn-secondary">
+      <button  className="mt-8 btn-secondary" onClick={changeGradient}>
         Change Background
       </button>
     </div>
