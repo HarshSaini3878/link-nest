@@ -22,24 +22,20 @@ const signUp = async (
   bio = '', // Default bio if not provided
   socialMediaHandles = {} // Default empty object if not provided
 ) => {
-  // Check if the username already exists
   const existingUser = await User.findOne({ username });
   if (existingUser) {
     throw new Error("Username is not available");
   }
 
-  // Hash the password and create the new user
   const hashedPassword = await bcrypt.hash(password, 10);
-  
-  // Merge socialMediaHandles with default values if not provided
   const finalSocialMediaHandles = { ...defaultSocialMediaHandles, ...socialMediaHandles };
 
   const newUser = new User({
     email,
     username,
-    password: hashedPassword, // Store the hashed password
-    bio, // Set bio to the passed value or default value
-    socialMediaHandles: finalSocialMediaHandles, // Set socialMediaHandles with merged data
+    password: hashedPassword,
+    bio,
+    socialMediaHandles: finalSocialMediaHandles,
   });
 
   console.log("new user:", newUser);
@@ -47,10 +43,10 @@ const signUp = async (
   try {
     const savedUser = await newUser.save();
     console.log('User saved:', savedUser);
-    return savedUser; // Return full user object instead of just username
+    return savedUser;
   } catch (err) {
     console.log('Error saving user:', err);
-    throw err; // You can rethrow or handle the error as needed
+    throw err;
   }
 };
 
@@ -59,7 +55,6 @@ export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
-      id: "credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
@@ -69,7 +64,6 @@ export const authOptions = {
         try {
           await connectDB();
 
-          // If username is provided, proceed with signup
           if (credentials?.username) {
             // Signup process
             return await signUp(
@@ -79,19 +73,12 @@ export const authOptions = {
             );
           }
 
-          // If no username is provided, proceed with signin (login)
-          const user = await User.findOne({
-            email: credentials?.email,
-          }).select("+password");
-
+          const user = await User.findOne({ email: credentials?.email }).select("+password");
           if (!user) {
             throw new Error("Invalid email or password");
           }
 
-          const passwordMatch = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
+          const passwordMatch = await bcrypt.compare(credentials.password, user.password);
           if (!passwordMatch) {
             throw new Error("Invalid email or password");
           }
@@ -127,6 +114,8 @@ export const authOptions = {
   },
 };
 
+// Next.js 15 API handler
 const handler = NextAuth(authOptions);
 
+// Export handler as GET and POST
 export { handler as GET, handler as POST };
