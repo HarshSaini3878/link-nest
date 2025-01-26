@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from '../../../libs/cloudinary'; // Assuming you have cloudinary setup
-import nextConnect from 'next-connect';
+import { NextConnect } from 'next-connect';
+
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -14,7 +15,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-const apiRoute = nextConnect();
+const apiRoute = NextConnect();
 
 apiRoute.use(upload.single('file')); // 'file' is the name of the form field
 
