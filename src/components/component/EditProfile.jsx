@@ -56,7 +56,29 @@ const EditProfile = ({ user }) => {
       },
     }));
   };
-
+  const uploadStagedFile = async (stagedFile) => {
+    const form = new FormData();
+    form.set("file", stagedFile); // Set the file from the input
+  
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: form,
+        headers: {
+          // You can add auth token headers here if required
+        },
+      });
+  
+      const data = await res.json();
+      if (data.imgUrl) {
+        console.log("File uploaded successfully:", data.imgUrl);
+      } else {
+        console.error("Upload failed:", data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {

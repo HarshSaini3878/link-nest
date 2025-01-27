@@ -1,41 +1,40 @@
-import { NextResponse } from 'next/server';
-import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../../../libs/cloudinary'; // Assuming you have cloudinary setup
-import { NextConnect } from 'next-connect';
+// /pages/api/upload.js
 
+import { cloudinary } from "../../../libs/cloudinary"; // Import cloudinary configuration
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'user_images', // Cloudinary folder name
-    allowed_formats: ['jpg', 'png', 'jpeg'],
-  },
-});
-
-const upload = multer({ storage });
-
-const apiRoute = NextConnect();
-
-apiRoute.use(upload.single('file')); // 'file' is the name of the form field
-
-export const config = {
-  api: {
-    bodyParser: false, // Disable bodyParser for file uploads
-  },
-};
-
-export async function POST(req) {
+export async function POST(req, res) {
   try {
-    const { file } = req; // Extract the file uploaded
+    // Get form data from the client
+    const formData = await req.formData();
+    const file = formData.get("file"); // "file" is the key from FormData
+
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const { secure_url, public_id } = file; // Extract the secure URL from Cloudinary
+    // Convert the file to Base64 encoding
+    const fileBuffer = await file.arrayBuffer();
+    const mimeType = file.type;
+    const encoding = "base64";
+    const base64Data = Buffer.from(fileBuffer).toString("base64");
 
-    return NextResponse.json({ url: secure_url, public_id }, { status: 200 }); // Return the URL
+    // Construct file URI to upload to Cloudinary
+    const fileUri = `data:${mimeType};${encoding},${base64Data}`;
+
+    // Upload to Cloudinary
+    const uploadResponse = await cloudinary.uploader.upload(fileUri, {
+      invalidate: true,
+      resource_type: "auto",
+      folder: "product-images", // Cloudinary folder name
+      filename_override: file.name,
+      use_filename: true,
+    });
+
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      imgUrl: uploadResponse.secure_url,
+    });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return res.status(500).json({ message: "Upload failed", error: error.message });
   }
 }
