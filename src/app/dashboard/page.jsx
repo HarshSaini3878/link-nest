@@ -63,7 +63,7 @@ export default function Dashboard() {
     if (user.username) {
       // Directly encode the username
       const encodedUsername = encodeURIComponent(user.username); // Encode the username
-      const profileUrl = `http://localhost:3000/username/${encodedUsername}`;
+      const profileUrl = `https://link-nest-9ws8.vercel.app/username/${encodedUsername}`;
       navigator.clipboard.writeText(profileUrl)
         .then(() => {
           toast('Profile link copied to clipboard',
